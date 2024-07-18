@@ -7,14 +7,16 @@ public class PlayerController : MonoBehaviour {
     private bool jumpInput;
     private bool boostInput;
     private Rigidbody2D rb;
-    private SpriteRenderer sr;
+    //private SpriteRenderer sr;
     private EdgeCollider2D ec;
     private BoxCollider2D bc;
     private TrailRenderer tr;
+    private Animator animator;
+    public Transform transform;
     // Constants
     private bool onGround = false;
     private bool isBoosted = false;
-    private float dir = -1f;
+    //private float dir = -1f;
     public float speed = 1000f;
     public float jumpVelocity = 35f;
     public float boostStrength = 5f;
@@ -22,20 +24,28 @@ public class PlayerController : MonoBehaviour {
     // Before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
-        sr = GetComponent<SpriteRenderer>();
+        //sr = GetComponent<SpriteRenderer>();
         ec = GetComponent<EdgeCollider2D>();
         tr = GetComponent<TrailRenderer>();
+        animator = GetComponent<Animator>();
+        transform = GetComponent<Transform>();
     }
 
     // Runs every 60 frames
     private void FixedUpdate() {
         horizontalInput = Input.GetAxisRaw("Horizontal");
+        if (horizontalInput == 0) {
+            animator.SetBool("isRunning", false);
+        } else if (horizontalInput != 0 && onGround) {
+            animator.SetBool("isRunning", true);
+        }
         if (horizontalInput > 0) {
-            sr.flipX = true;
-            dir = 1f;
-        } else if (horizontalInput < 0) {
-            sr.flipX = false;
-            dir = -1f;
+            transform.eulerAngles = new Vector3(0, 0, 0);
+            //dir = 1f;
+        }
+        else if (horizontalInput < 0) {
+            transform.eulerAngles = new Vector3(0, 180, 0);
+            //dir = -1f;
         }
         float horizontalMovement = horizontalInput * speed * Time.deltaTime;
         rb.velocity = new Vector2(horizontalMovement, rb.velocity.y);
@@ -45,12 +55,13 @@ public class PlayerController : MonoBehaviour {
     void Update() {
         jumpInput = Input.GetButton("Jump");
         boostInput = Input.GetButton("Fire3");
+
         if (jumpInput && onGround) rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
         if (boostInput && !isBoosted) {
             tr.emitting = true;
             isBoosted = true;
-            float boostVel = dir * speed * boostStrength * Time.deltaTime;
-            rb.velocity = new Vector2(boostVel, jumpVelocity); 
+            // float boostVel = dir * speed * boostStrength * Time.deltaTime;
+            rb.velocity = new Vector2(rb.velocity.x, jumpVelocity); 
         }
     }
 
