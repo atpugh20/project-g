@@ -5,51 +5,64 @@ using UnityEngine;
 public class PlayerController : MonoBehaviour {
     private float horizontalInput;
     private bool jumpInput;
+    private bool boostInput;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
-    private BoxCollider2D fCol;
+    private EdgeCollider2D ec;
+    private BoxCollider2D bc;
+    private TrailRenderer tr;
     // Constants
     private bool onGround = false;
-    public float speed = 20f;
-    public float jumpVelocity = 35;
-    
-    
+    private bool isBoosted = false;
+    private float dir = -1f;
+    public float speed = 1000f;
+    public float jumpVelocity = 35f;
+    public float boostStrength = 5f;
+
+    // Before the first frame update
     void Start() {
-        // Start is called before the first frame update
         rb = GetComponent<Rigidbody2D>();
         sr = GetComponent<SpriteRenderer>();
-        fCol = GameObject.Find("FeetCollider").GetComponent<BoxCollider2D>();
-
+        ec = GetComponent<EdgeCollider2D>();
+        tr = GetComponent<TrailRenderer>();
     }
 
+    // Runs every 60 frames
     private void FixedUpdate() {
-        // Runs every 60 frames
-
         horizontalInput = Input.GetAxisRaw("Horizontal");
-        // flip sprite based on movement direction
         if (horizontalInput > 0) {
             sr.flipX = true;
+            dir = 1f;
         } else if (horizontalInput < 0) {
             sr.flipX = false;
+            dir = -1f;
         }
         float horizontalMovement = horizontalInput * speed * Time.deltaTime;
         rb.velocity = new Vector2(horizontalMovement, rb.velocity.y);
     }
 
-
+    // Runs once every frame (machine dependent)
     void Update() {
-        // Runs once every frame (machine dependent)
-
         jumpInput = Input.GetButton("Jump");
-        if (jumpInput && onGround) {
-            onGround = false;
-            rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+        boostInput = Input.GetButton("Fire3");
+        if (jumpInput && onGround) rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+        if (boostInput && !isBoosted) {
+            tr.emitting = true;
+            isBoosted = true;
+            float boostVel = dir * speed * boostStrength * Time.deltaTime;
+            rb.velocity = new Vector2(boostVel, jumpVelocity); 
         }
-       
     }
 
     void OnCollisionStay2D(Collision2D col) {
-        if (col.gameObject.tag == "Ground") onGround = true;
-        print(fCol);
+        if (col.otherCollider == ec) { 
+            onGround = true;
+            isBoosted = false;
+            tr.emitting = false;
+        }
+    }
+
+    void OnCollisionExit2D(Collision2D col) {
+        onGround = false;
     }
 }
