@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -22,6 +23,7 @@ public class PlayerController : MonoBehaviour {
     public float speed = 1000f;
     public float jumpVelocity = 35f;
     public float boostStrength = 5f;
+    public float deadZone = 0.05f;
 
     // Before the first frame update
     void Start() {
@@ -38,18 +40,19 @@ public class PlayerController : MonoBehaviour {
     // Runs every 60 frames
     private void FixedUpdate() {
         horizontalInput = Input.GetAxisRaw("Horizontal");
-        if (horizontalInput == 0) {
+        print(horizontalInput);
+        if (-deadZone < horizontalInput && horizontalInput < deadZone) {
+            animator.speed = 1;
             animator.SetBool("isRunning", false);
-        } else if (horizontalInput != 0 && onGround) {
+        } else {
+            animator.speed = Math.Abs(horizontalInput);
             animator.SetBool("isRunning", true);
         }
         if (horizontalInput > 0) {
             transform.eulerAngles = new Vector3(0, 0, 0);
-            //dir = 1f;
         }
         else if (horizontalInput < 0) {
             transform.eulerAngles = new Vector3(0, 180, 0);
-            //dir = -1f;
         }
         float horizontalMovement = horizontalInput * speed * Time.deltaTime;
         rb.velocity = new Vector2(horizontalMovement, rb.velocity.y);
