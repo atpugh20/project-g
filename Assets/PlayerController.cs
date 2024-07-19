@@ -8,7 +8,6 @@ public class PlayerController : MonoBehaviour {
     private bool jumpInput;
     private bool boostInput;
     private Rigidbody2D rb;
-    //private SpriteRenderer sr;
     private CapsuleCollider2D[] capsules;
     private CapsuleCollider2D fCol;
     private CapsuleCollider2D wCol;
@@ -16,10 +15,8 @@ public class PlayerController : MonoBehaviour {
     private TrailRenderer tr;
     private Animator animator;
     public Transform transform;
-    // Constants
     private bool onGround = false;
     private bool isBoosted = false;
-    //private float dir = -1f;
     public float speed = 1000f;
     public float jumpVelocity = 35f;
     public float boostStrength = 5f;
@@ -31,7 +28,6 @@ public class PlayerController : MonoBehaviour {
         capsules = GetComponents<CapsuleCollider2D>();
         wCol = capsules[0];
         fCol = capsules[1];
-        
         tr = GetComponent<TrailRenderer>();
         animator = GetComponent<Animator>();
         transform = GetComponent<Transform>();
@@ -40,7 +36,6 @@ public class PlayerController : MonoBehaviour {
     // Runs every 60 frames
     private void FixedUpdate() {
         horizontalInput = Input.GetAxisRaw("Horizontal");
-        print(horizontalInput);
         if (-deadZone < horizontalInput && horizontalInput < deadZone) {
             animator.speed = 1;
             animator.SetBool("isRunning", false);
@@ -62,12 +57,13 @@ public class PlayerController : MonoBehaviour {
     void Update() {
         jumpInput = Input.GetButton("Jump");
         boostInput = Input.GetButton("Fire3");
-
-        if (jumpInput && onGround) rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+        if (jumpInput && onGround) {
+            animator.SetBool("isJumping", true);
+            rb.velocity = new Vector2(rb.velocity.x, jumpVelocity);
+        }
         if (boostInput && !isBoosted) {
             tr.emitting = true;
             isBoosted = true;
-            // float boostVel = dir * speed * boostStrength * Time.deltaTime;
             rb.velocity = new Vector2(rb.velocity.x, jumpVelocity); 
         }
     }
@@ -77,6 +73,7 @@ public class PlayerController : MonoBehaviour {
             onGround = true;
             isBoosted = false;
             tr.emitting = false;
+            animator.SetBool("isJumping", false);
         }
     }
 
