@@ -8,7 +8,9 @@ public class PlayerController : MonoBehaviour {
     private bool boostInput;
     private Rigidbody2D rb;
     //private SpriteRenderer sr;
-    private EdgeCollider2D ec;
+    private CapsuleCollider2D[] capsules;
+    private CapsuleCollider2D fCol;
+    private CapsuleCollider2D wCol;
     private BoxCollider2D bc;
     private TrailRenderer tr;
     private Animator animator;
@@ -24,8 +26,10 @@ public class PlayerController : MonoBehaviour {
     // Before the first frame update
     void Start() {
         rb = GetComponent<Rigidbody2D>();
-        //sr = GetComponent<SpriteRenderer>();
-        ec = GetComponent<EdgeCollider2D>();
+        capsules = GetComponents<CapsuleCollider2D>();
+        wCol = capsules[0];
+        fCol = capsules[1];
+        
         tr = GetComponent<TrailRenderer>();
         animator = GetComponent<Animator>();
         transform = GetComponent<Transform>();
@@ -66,7 +70,7 @@ public class PlayerController : MonoBehaviour {
     }
 
     void OnCollisionStay2D(Collision2D col) {
-        if (col.otherCollider == ec) { 
+        if (col.otherCollider == fCol) {
             onGround = true;
             isBoosted = false;
             tr.emitting = false;
