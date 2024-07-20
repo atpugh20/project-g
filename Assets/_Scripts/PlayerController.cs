@@ -138,7 +138,7 @@ namespace TController {
             _coyoteUsable = false;
             _frameVelocity.y = _stats.JumpPower;
             _anim.SetTrigger("takeoff");
-            
+
             Jumped?.Invoke();
         }
 
@@ -156,8 +156,8 @@ namespace TController {
                 _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_frameInput.Move.x));
                 if (_frameInput.Move.x > 0) {
                     _transform.eulerAngles = new Vector3(0, 0, 0);
-                } else if (_frameInput.Move.x < 0) { 
-                    _transform.eulerAngles = new Vector3(0, 180, 0); 
+                } else if (_frameInput.Move.x < 0) {
+                    _transform.eulerAngles = new Vector3(0, 180, 0);
                 }
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
                 _anim.SetBool("isRunning", true);
@@ -181,7 +181,7 @@ namespace TController {
         #endregion
 
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
-        
+
 
 #if UNITY_EDITOR
         private void OnValidate()
@@ -189,7 +189,20 @@ namespace TController {
             if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset to the Player Controller's Stats slot", this);
         }
 #endif
+    
+
+    public void Die()
+        {
+            Debug.Log("Player has died!");
+        }
+
+    public void Bounce(float bounceForce)
+    {
+        _frameVelocity.y = bounceForce;
+        _anim.SetTrigger("takeoff");
     }
+
+   }
 
     public struct FrameInput {
         public bool JumpDown;
