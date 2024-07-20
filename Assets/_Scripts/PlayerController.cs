@@ -15,6 +15,7 @@ namespace TController {
         private Rigidbody2D _rb;
         private CapsuleCollider2D _col;
         private Animator _anim;
+        private Transform _transform;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
@@ -33,7 +34,7 @@ namespace TController {
             _rb = GetComponent<Rigidbody2D>();
             _col = GetComponent<CapsuleCollider2D>();
             _anim = GetComponent<Animator>();
-
+            _transform = GetComponent<Transform>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
 
@@ -87,14 +88,17 @@ namespace TController {
 
             // Landed on the Ground
             if (!_grounded && groundHit) {
+                _anim.SetBool("isJumping", false);
                 _grounded = true;
                 _coyoteUsable = true;
                 _bufferedJumpUsable = true;
                 _endedJumpEarly = false;
                 GroundedChanged?.Invoke(true, Mathf.Abs(_frameVelocity.y));
+
             }
             // Left the Ground
             else if (_grounded && !groundHit) {
+                _anim.SetBool("isJumping", true);
                 _grounded = false;
                 _frameLeftGrounded = _time;
                 GroundedChanged?.Invoke(false, 0);
@@ -134,7 +138,7 @@ namespace TController {
             _coyoteUsable = false;
             _frameVelocity.y = _stats.JumpPower;
             _anim.SetTrigger("takeoff");
-            _anim.SetBool("isJumping", true);
+            
             Jumped?.Invoke();
         }
 
@@ -144,10 +148,19 @@ namespace TController {
 
         private void HandleDirection() {
             if (_frameInput.Move.x == 0) {
+                _anim.SetFloat("runSpeedMultiplier", 1);
+                _anim.SetBool("isRunning", false);
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
+                _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_frameInput.Move.x));
+                if (_frameInput.Move.x > 0) {
+                    _transform.eulerAngles = new Vector3(0, 0, 0);
+                } else if (_frameInput.Move.x < 0) { 
+                    _transform.eulerAngles = new Vector3(0, 180, 0); 
+                }
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
+                _anim.SetBool("isRunning", true);
             }
         }
 
