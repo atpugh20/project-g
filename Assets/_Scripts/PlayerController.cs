@@ -14,6 +14,7 @@ namespace TController {
         [SerializeField] private ScriptableStats _stats;
         private Rigidbody2D _rb;
         private CapsuleCollider2D _col;
+        private Animator _anim;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
@@ -31,6 +32,7 @@ namespace TController {
         private void Awake() {
             _rb = GetComponent<Rigidbody2D>();
             _col = GetComponent<CapsuleCollider2D>();
+            _anim = GetComponent<Animator>();
 
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
@@ -131,6 +133,8 @@ namespace TController {
             _bufferedJumpUsable = false;
             _coyoteUsable = false;
             _frameVelocity.y = _stats.JumpPower;
+            _anim.SetTrigger("takeoff");
+            _anim.SetBool("isJumping", true);
             Jumped?.Invoke();
         }
 
@@ -164,6 +168,7 @@ namespace TController {
         #endregion
 
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
+        
 
 #if UNITY_EDITOR
         private void OnValidate()
