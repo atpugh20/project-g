@@ -112,6 +112,7 @@ namespace TController {
 
         #region Jumping
 
+        private int _jumpNum;
         private bool _jumpToConsume;
         private bool _bufferedJumpUsable;
         private bool _endedJumpEarly;
@@ -126,8 +127,11 @@ namespace TController {
 
             if (!_jumpToConsume && !HasBufferedJump) return;
 
-            if (_grounded || CanUseCoyote) ExecuteJump();
+            if (_grounded) _jumpNum = 0; // double jump
 
+            if (_jumpNum < 2 || CanUseCoyote) ExecuteJump(); 
+            
+            _jumpNum++;
             _jumpToConsume = false;
         }
 
