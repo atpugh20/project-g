@@ -41,7 +41,7 @@ public class UIButtonHandle : MonoBehaviour {
             _xButtonModifier.interactable = false;
         }
         // A Button
-        if (_pController._jumpToConsume) {
+        if (_pController._grounded || _pController.CanUseCoyote) {
             _aButtonModifier.interactable = true;
         } else {
             _aButtonModifier.interactable = false;
