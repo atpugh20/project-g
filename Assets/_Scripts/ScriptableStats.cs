@@ -52,5 +52,11 @@ namespace TController
 
         [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
         public float JumpBuffer = .2f;
+
+        [Tooltip("Base Strength of the fire dash")]
+        public float DashPower = 100;
+
+        [Tooltip("Base Length of the fire dash")]
+        public float DashLength = 0.5f;
     }
 }

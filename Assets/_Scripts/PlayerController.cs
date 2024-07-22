@@ -47,6 +47,8 @@ namespace TController {
             _frameInput = new FrameInput {
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
+                DashDown = Input.GetButtonDown("Fire3") || Input.GetKey(KeyCode.C),
+                DashHeld = Input.GetButton("Fire3") || Input.GetKey(KeyCode.C),
                 Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             };
 
@@ -59,15 +61,16 @@ namespace TController {
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
             }
+            //if (_frameInput.DashDown) _canDash = true;
+            
         }
 
         private void FixedUpdate() {
             CheckCollisions();
-
             HandleJump();
+            HandleDash();
             HandleDirection();
             HandleGravity();
-
             ApplyMovement();
         }
 
@@ -90,6 +93,7 @@ namespace TController {
             if (!_grounded && groundHit) {
                 _anim.SetBool("isJumping", false);
                 _grounded = true;
+                //_canDash = true;
                 _coyoteUsable = true;
                 _bufferedJumpUsable = true;
                 _endedJumpEarly = false;
@@ -112,12 +116,12 @@ namespace TController {
 
         #region Jumping
 
-        private int _jumpNum;
         private bool _jumpToConsume;
         private bool _bufferedJumpUsable;
         private bool _endedJumpEarly;
         private bool _coyoteUsable;
         private float _timeJumpWasPressed;
+
 
         private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
         private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
@@ -126,12 +130,8 @@ namespace TController {
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
 
             if (!_jumpToConsume && !HasBufferedJump) return;
-
-            if (_grounded) _jumpNum = 0; // double jump
-
-            if (_jumpNum < 2 || CanUseCoyote) ExecuteJump(); 
-            
-            _jumpNum++;
+            if (_grounded || CanUseCoyote) ExecuteJump(); 
+           
             _jumpToConsume = false;
         }
 
@@ -148,6 +148,36 @@ namespace TController {
 
         #endregion
 
+        #region Dashing
+
+        private bool _canDash = true;
+        private bool _isDashing = false;
+        private int _dashRefreshTime = 1;
+        private int _timeSinceDash = 0;
+
+        private void HandleDash() {
+            _timeSinceDash++;
+            print(_frameInput.Move);
+            if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
+                _stats.FallAcceleration = 110;
+                _isDashing = false; 
+            }
+
+            if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
+            if (!_canDash || !_frameInput.DashHeld) return;
+            _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y);
+            _stats.FallAcceleration = 0;
+            _timeSinceDash = 0;
+            _canDash = false;
+            _isDashing = true;
+            _endedJumpEarly = true;
+            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
+            
+        }
+
+
+        #endregion
+
         #region Horizontal
 
         private void HandleDirection() {
@@ -157,13 +187,13 @@ namespace TController {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
-                _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_frameInput.Move.x));
+                _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
                 if (_frameInput.Move.x > 0) {
                     _transform.eulerAngles = new Vector3(0, 0, 0);
                 } else if (_frameInput.Move.x < 0) {
                     _transform.eulerAngles = new Vector3(0, 180, 0);
                 }
-                _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
+                if (!_isDashing) _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
                 _anim.SetBool("isRunning", true);
             }
         }
@@ -211,6 +241,8 @@ namespace TController {
     public struct FrameInput {
         public bool JumpDown;
         public bool JumpHeld;
+        public bool DashDown;
+        public bool DashHeld;
         public Vector2 Move;
     }
 
