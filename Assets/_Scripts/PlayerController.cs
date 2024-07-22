@@ -16,6 +16,7 @@ namespace TController {
         private CapsuleCollider2D _col;
         private Animator _anim;
         private Transform _transform;
+        private TrailRenderer _trail;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
@@ -35,6 +36,7 @@ namespace TController {
             _col = GetComponent<CapsuleCollider2D>();
             _anim = GetComponent<Animator>();
             _transform = GetComponent<Transform>();
+            _trail = GetComponent<TrailRenderer>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
 
@@ -93,7 +95,6 @@ namespace TController {
             if (!_grounded && groundHit) {
                 _anim.SetBool("isJumping", false);
                 _grounded = true;
-                //_canDash = true;
                 _coyoteUsable = true;
                 _bufferedJumpUsable = true;
                 _endedJumpEarly = false;
@@ -160,7 +161,8 @@ namespace TController {
             print(_frameInput.Move);
             if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
                 _stats.FallAcceleration = 110;
-                _isDashing = false; 
+                _isDashing = false;
+                _trail.emitting = false;
             }
 
             if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
@@ -172,6 +174,7 @@ namespace TController {
             _isDashing = true;
             _endedJumpEarly = true;
             _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
+            _trail.emitting = true;
             
         }
 
