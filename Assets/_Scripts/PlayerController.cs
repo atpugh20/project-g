@@ -117,7 +117,7 @@ namespace TController {
 
         #region Jumping
 
-        private bool _jumpToConsume;
+        public bool _jumpToConsume;
         private bool _bufferedJumpUsable;
         private bool _endedJumpEarly;
         private bool _coyoteUsable;
@@ -151,14 +151,13 @@ namespace TController {
 
         #region Dashing
 
-        private bool _canDash = true;
+        public bool _canDash = true;
         private bool _isDashing = false;
-        private int _dashRefreshTime = 1;
+        private float _dashRefreshTime = 0.5f;
         private int _timeSinceDash = 0;
 
         private void HandleDash() {
             _timeSinceDash++;
-            print(_frameInput.Move);
             if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
                 _stats.FallAcceleration = 110;
                 _isDashing = false;
@@ -167,7 +166,6 @@ namespace TController {
 
             if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
             if (!_canDash || !_frameInput.DashHeld) return;
-            _anim.SetTrigger("takeoff");
             _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y);
             _stats.FallAcceleration = 0;
             _timeSinceDash = 0;
