@@ -167,6 +167,7 @@ namespace TController {
 
             if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
             if (!_canDash || !_frameInput.DashHeld) return;
+            _anim.SetTrigger("takeoff");
             _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y);
             _stats.FallAcceleration = 0;
             _timeSinceDash = 0;
