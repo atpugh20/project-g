@@ -79,7 +79,7 @@ namespace TController {
         #region Collisions
 
         private float _frameLeftGrounded = float.MinValue;
-        private bool _grounded;
+        public bool _grounded;
 
         private void CheckCollisions() {
             Physics2D.queriesStartInColliders = false;
@@ -125,7 +125,7 @@ namespace TController {
 
 
         private bool HasBufferedJump => _bufferedJumpUsable && _time < _timeJumpWasPressed + _stats.JumpBuffer;
-        private bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
+        public bool CanUseCoyote => _coyoteUsable && !_grounded && _time < _frameLeftGrounded + _stats.CoyoteTime;
 
         private void HandleJump() {
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
