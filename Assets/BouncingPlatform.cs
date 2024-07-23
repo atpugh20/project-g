@@ -20,6 +20,7 @@ public class BouncingPlatform : MonoBehaviour
         {
             animator.SetBool("isBouncing", true);
             animator.Play("BounceActive");
+            animator.SetBool("isBouncing", false);
 
             //Debug.Log("Player collision detected");
             PlayerController playerController = collision.gameObject.GetComponent<PlayerController>();
