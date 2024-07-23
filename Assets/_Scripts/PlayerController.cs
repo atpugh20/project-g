@@ -17,6 +17,12 @@ namespace TController {
         private Animator _anim;
         private Transform _transform;
         private TrailRenderer _trail;
+        private AudioSource _stepSound;
+        private AudioSource _fireDashSound;
+        private AudioSource _landSound;
+        public GameObject StepSound;
+        public GameObject FireDashSound;
+        public GameObject LandSound;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
@@ -37,6 +43,9 @@ namespace TController {
             _anim = GetComponent<Animator>();
             _transform = GetComponent<Transform>();
             _trail = GetComponent<TrailRenderer>();
+            _stepSound = StepSound.GetComponent<AudioSource>();
+            _fireDashSound = FireDashSound.GetComponent<AudioSource>();
+            _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
 
@@ -93,6 +102,7 @@ namespace TController {
 
             // Landed on the Ground
             if (!_grounded && groundHit) {
+                _landSound.Play();
                 _anim.SetBool("isJumping", false);
                 _grounded = true;
                 _coyoteUsable = true;
@@ -172,6 +182,7 @@ namespace TController {
             _canDash = false;
             _isDashing = true;
             _endedJumpEarly = true;
+            PlayFireDashSound();
             _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
             _trail.emitting = true;
             
@@ -218,6 +229,12 @@ namespace TController {
 
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
+        // AUDIO
+       
+
+        public void PlayStepSound() => _stepSound.Play();
+        public void PlayFireDashSound() => _fireDashSound.Play();
+      
 
 #if UNITY_EDITOR
         private void OnValidate()
