@@ -39,7 +39,7 @@ public class UIButtonHandle : MonoBehaviour {
         // Changes the opacity/color of the buttons when they are available
 
         // X Button
-        if (_pController._canDash) {
+        if (_pController._canUseFlame) {
             _xButtonModifier.interactable = true;
         } else {
             _xButtonModifier.interactable = false;

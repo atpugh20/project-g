@@ -18,14 +18,19 @@ namespace TController {
         private Transform _transform;
         private TrailRenderer _trail;
         private AudioSource _stepSound;
-        private AudioSource _fireDashSound;
+        private AudioSource _flameDashSound;
         private AudioSource _landSound;
-        public GameObject StepSound;
-        public GameObject FireDashSound;
-        public GameObject LandSound;
         private FrameInput _frameInput;
         private Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
+
+        public bool hasStaff;
+        public bool hasFlame;
+        public bool hasWater;
+        public bool hasEarth;
+        public GameObject StepSound;
+        public GameObject FlameDashSound;
+        public GameObject LandSound;
 
         #region Interface
 
@@ -44,7 +49,7 @@ namespace TController {
             _transform = GetComponent<Transform>();
             _trail = GetComponent<TrailRenderer>();
             _stepSound = StepSound.GetComponent<AudioSource>();
-            _fireDashSound = FireDashSound.GetComponent<AudioSource>();
+            _flameDashSound = FlameDashSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
@@ -56,10 +61,14 @@ namespace TController {
 
         private void GatherInput() {
             _frameInput = new FrameInput {
+                // Jump button
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
-                DashDown = Input.GetButtonDown("Fire3") || Input.GetKey(KeyCode.C),
-                DashHeld = Input.GetButton("Fire3") || Input.GetKey(KeyCode.C),
+                // Fire button
+                FlameDown = Input.GetButtonDown("Fire3") || Input.GetKey(KeyCode.C),
+                FlameHeld = Input.GetButton("Fire3") || Input.GetKey(KeyCode.C),
+
+                // Control stick
                 Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             };
 
@@ -71,18 +80,20 @@ namespace TController {
             if (_frameInput.JumpDown) {
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
-            }
-            //if (_frameInput.DashDown) _canDash = true;
-            
+            }     
         }
 
         private void FixedUpdate() {
             CheckCollisions();
             HandleJump();
-            HandleDash();
+            HandlePowers();
             HandleDirection();
             HandleGravity();
             ApplyMovement();
+        }
+
+        private void HandlePowers() {
+            if (hasFlame) HandleFlame();
         }
 
         #region Collisions
@@ -124,7 +135,6 @@ namespace TController {
 
         #endregion
 
-
         #region Jumping
 
         public bool _jumpToConsume;
@@ -159,36 +169,57 @@ namespace TController {
 
         #endregion
 
-        #region Dashing
+        #region Fire
 
-        public bool _canDash = true;
+        private float _flameRefreshTime = 0.5f;
+        private int _timeSinceFlameUse = 0;
+        public bool _canUseFlame = true;
         private bool _isDashing = false;
-        private float _dashRefreshTime = 0.5f;
-        private int _timeSinceDash = 0;
+        private Vector3 _originalAngle = new(0, 0, 0);
 
-        private void HandleDash() {
-            _timeSinceDash++;
-            if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
+        private void HandleFlame() {
+            _timeSinceFlameUse++;
+
+            // Checks flame conditions
+            if (_grounded && !_isDashing && !_frameInput.FlameHeld && _timeSinceFlameUse * Time.deltaTime > _flameRefreshTime) _canUseFlame = true;
+
+            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || _isDashing) {
+                HandleFlameDash();
+            } else {
+                HandleNeutralFlame();
+            }
+        }
+
+        private void HandleNeutralFlame() {
+            if (!_canUseFlame || !_frameInput.FlameHeld) return;
+            _canUseFlame = false;
+            _timeSinceFlameUse = 0;
+        }
+
+        private void HandleFlameDash() { 
+            // Checks timing of the dash
+            if (_stats.DashLength <= _timeSinceFlameUse * Time.deltaTime) {
                 _stats.FallAcceleration = 110;
                 _isDashing = false;
                 _anim.SetBool("isFlameDashing", false);
+                _transform.eulerAngles = _originalAngle;
             }
+            
+            if (!_canUseFlame || !_frameInput.FlameHeld) return;
 
-            if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
-            if (!_canDash || !_frameInput.DashHeld) return;
+            // Starts dash
+            PlayFlameDashSound();
+            _originalAngle = new(_transform.rotation.x, _transform.rotation.y, _transform.rotation.z);
             _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y);
             _stats.FallAcceleration = 0;
-            _timeSinceDash = 0;
-            _canDash = false;
+            _timeSinceFlameUse = 0;
+            _canUseFlame = false;
             _isDashing = true;
             _endedJumpEarly = true;
-
             _anim.SetBool("isFlameDashing", true);
-
-            PlayFireDashSound();
-            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
-           // _trail.emitting = true;
-            
+            float newAngle = Mathf.Atan2(_frameInput.Move.y, _frameInput.Move.x) * Mathf.Rad2Deg;
+            _transform.eulerAngles = new Vector3(0f, _transform.rotation.y, newAngle);
+            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);   
         }
 
         #endregion
@@ -202,14 +233,16 @@ namespace TController {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
-                _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
-                if (_frameInput.Move.x > 0) {
-                    _transform.eulerAngles = new Vector3(0, 0, 0);
-                } else if (_frameInput.Move.x < 0) {
-                    _transform.eulerAngles = new Vector3(0, 180, 0);
+                if (!_isDashing) {
+                    _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
+                    if (_frameInput.Move.x > 0) {
+                        _transform.eulerAngles = new Vector3(0f, 0f, _transform.rotation.z);
+                    } else if (_frameInput.Move.x < 0) {
+                        _transform.eulerAngles = new Vector3(0f, 180f, _transform.rotation.z);
+                    }
+                    _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
+                    _anim.SetBool("isRunning", true);
                 }
-                if (!_isDashing) _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
-                _anim.SetBool("isRunning", true);
             }
         }
 
@@ -233,26 +266,22 @@ namespace TController {
 
         // AUDIO
        
-
         public void PlayStepSound() => _stepSound.Play();
-        public void PlayFireDashSound() => _fireDashSound.Play();
+        public void PlayFlameDashSound() => _flameDashSound.Play();
       
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
+        private void OnValidate() {
             if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset to the Player Controller's Stats slot", this);
         }
 #endif
     
 
-    public void Die()
-        {
+    public void Die() {
             Debug.Log("Player has died!");
         }
 
-    public void Bounce(float bounceForce)
-    {
+    public void Bounce(float bounceForce){
         _frameVelocity.y = bounceForce;
         _anim.SetTrigger("takeoff");
     }
@@ -262,8 +291,8 @@ namespace TController {
     public struct FrameInput {
         public bool JumpDown;
         public bool JumpHeld;
-        public bool DashDown;
-        public bool DashHeld;
+        public bool FlameDown;
+        public bool FlameHeld;
         public Vector2 Move;
     }
 
