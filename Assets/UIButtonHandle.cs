@@ -38,11 +38,21 @@ public class UIButtonHandle : MonoBehaviour {
     void buttonActivate() {   
         // Changes the opacity/color of the buttons when they are available
 
-        // X Button
-        if (_pController._canUseFlame) {
+        // Flame Button
+        if (_pController._canUseFlame && _pController.hasFlame) {
             _xButtonModifier.interactable = true;
         } else {
             _xButtonModifier.interactable = false;
+        }
+        if (_pController._canUseEarth && _pController.hasEarth) {
+            _yButtonModifier.interactable = true;
+        } else {
+            _yButtonModifier.interactable = false;
+        }
+        if (_pController._canUseWater && _pController.hasWater) {
+            _bButtonModifier.interactable = true;
+        } else {
+            _bButtonModifier.interactable = false;
         }
         // A Button
         if (_pController._grounded || _pController.CanUseCoyote) {

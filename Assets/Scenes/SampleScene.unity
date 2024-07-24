@@ -3381,14 +3381,16 @@ MonoBehaviour:
   _stats: {fileID: 11400000, guid: 8b16b950b24ef044a89f88e86cf641fe, type: 2}
   hasStaff: 0
   hasFlame: 1
-  hasWater: 0
-  hasEarth: 0
+  hasWater: 1
+  hasEarth: 1
   StepSound: {fileID: 562374450}
   FlameDashSound: {fileID: 1473108311}
   LandSound: {fileID: 345171046}
   _grounded: 0
   _jumpToConsume: 0
   _canUseFlame: 1
+  _canUseEarth: 1
+  _canUseWater: 1
 --- !u!70 &904424138
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -5901,7 +5903,7 @@ MonoBehaviour:
   AButtonText: {fileID: 1005359570}
   BButton: {fileID: 348055469}
   EnabledButtonColor: {r: 1, g: 1, b: 1, a: 1}
-  DisabledButtonColor: {r: 0.4716981, g: 0.4716981, b: 0.4716981, a: 1}
+  DisabledButtonColor: {r: 0.254717, g: 0.254717, b: 0.254717, a: 1}
 --- !u!4 &1901883163 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2438744145188540284, guid: d9d775c31fed41b468a9c497374479fb, type: 3}

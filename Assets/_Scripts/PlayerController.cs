@@ -64,10 +64,15 @@ namespace TController {
                 // Jump button
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
+                // Earth button
+                EarthDown = Input.GetButtonDown("Fire1") || Input.GetKeyDown(KeyCode.C),
+                EarthHeld = Input.GetButton("Fire1") || Input.GetKey(KeyCode.C),
+                // Water button
+                WaterDown = Input.GetButtonDown("Fire2") || Input.GetKeyDown(KeyCode.C),
+                WaterHeld = Input.GetButton("Fire2") || Input.GetKey(KeyCode.C),
                 // Fire button
-                FlameDown = Input.GetButtonDown("Fire3") || Input.GetKey(KeyCode.C),
+                FlameDown = Input.GetButtonDown("Fire3") || Input.GetKeyDown(KeyCode.C),
                 FlameHeld = Input.GetButton("Fire3") || Input.GetKey(KeyCode.C),
-
                 // Control stick
                 Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             };
@@ -93,7 +98,9 @@ namespace TController {
         }
 
         private void HandlePowers() {
-            if (hasFlame) HandleFlame();
+            if (hasFlame) HandleFlame(); 
+            if (hasEarth) HandleEarth();
+            if (hasWater) HandleWater();
         }
 
         #region Collisions
@@ -224,6 +231,78 @@ namespace TController {
 
         #endregion
 
+        #region Earth
+
+        private float _earthRefreshTime = 0.5f;
+        private int _timeSinceEarthUse = 0;
+        public bool _canUseEarth = true;
+        private bool _isEarthing = false;
+        private Vector3 _originalEarthAngle = new(0, 0, 0);
+
+        private void HandleEarth() {
+            _timeSinceEarthUse++;
+
+            // Checks water conditions
+            if (_grounded && !_isEarthing && !_frameInput.EarthHeld && _timeSinceEarthUse * Time.deltaTime > _earthRefreshTime) _canUseEarth = true;
+
+            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || _isEarthing) {
+                HandleSideEarth();
+            } else {
+                HandleNeutralEarth();
+            }
+        }
+        private void HandleNeutralEarth() {
+            if (!_canUseEarth || !_frameInput.EarthHeld) return;
+            _canUseEarth = false;
+            _timeSinceEarthUse = 0;
+            print("NEUTRAL EARTH");
+        }
+
+        private void HandleSideEarth() {
+            if (!_canUseEarth || !_frameInput.EarthHeld) return;
+            _canUseEarth = false;
+            _timeSinceEarthUse = 0;
+            print("SIDE EARTH");
+        }
+
+        #endregion
+
+        #region Water
+
+        private float _waterRefreshTime = 0.5f;
+        private int _timeSinceWaterUse = 0;
+        public bool _canUseWater = true;
+        private bool _isWatering = false;
+        private Vector3 _originalWaterAngle = new(0, 0, 0);
+
+        private void HandleWater() {
+            _timeSinceWaterUse++;
+
+            // Checks water conditions
+            if (_grounded && !_isWatering && !_frameInput.WaterHeld && _timeSinceWaterUse * Time.deltaTime > _waterRefreshTime) _canUseWater = true;
+
+            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || _isWatering) {
+                HandleSideWater();
+            } else {
+                HandleNeutralWater();
+            }
+        }
+        private void HandleNeutralWater() {
+            if (!_canUseWater || !_frameInput.WaterHeld) return;
+            _canUseWater = false;
+            _timeSinceWaterUse = 0;
+            print("NEUTRAL WATER");
+        }
+
+        private void HandleSideWater() {
+            if (!_canUseWater || !_frameInput.WaterHeld) return;
+            _canUseWater = false;
+            _timeSinceWaterUse = 0;
+            print("SIDE WATER");
+        }
+
+        #endregion
+
         #region Horizontal
 
         private void HandleDirection() {
@@ -293,6 +372,10 @@ namespace TController {
         public bool JumpHeld;
         public bool FlameDown;
         public bool FlameHeld;
+        public bool WaterDown;
+        public bool WaterHeld;
+        public bool EarthDown;
+        public bool EarthHeld;
         public Vector2 Move;
     }
 
