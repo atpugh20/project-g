@@ -171,7 +171,7 @@ namespace TController {
             if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
                 _stats.FallAcceleration = 110;
                 _isDashing = false;
-                _trail.emitting = false;
+                _anim.SetBool("isFlameDashing", false);
             }
 
             if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
@@ -182,9 +182,12 @@ namespace TController {
             _canDash = false;
             _isDashing = true;
             _endedJumpEarly = true;
+
+            _anim.SetBool("isFlameDashing", true);
+
             PlayFireDashSound();
             _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
-            _trail.emitting = true;
+           // _trail.emitting = true;
             
         }
 
