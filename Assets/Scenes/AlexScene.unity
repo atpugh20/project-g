@@ -386,7 +386,7 @@ GameObject:
   - component: {fileID: 352965493}
   - component: {fileID: 352965494}
   m_Layer: 0
-  m_Name: s_firedash
+  m_Name: s_flamedash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2108,12 +2108,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   _stats: {fileID: 11400000, guid: 8b16b950b24ef044a89f88e86cf641fe, type: 2}
+  hasStaff: 0
+  hasFlame: 1
+  hasWater: 0
+  hasEarth: 0
   StepSound: {fileID: 1007849542}
-  FireDashSound: {fileID: 352965492}
+  FlameDashSound: {fileID: 352965492}
   LandSound: {fileID: 1634667741}
   _grounded: 0
   _jumpToConsume: 0
-  _canDash: 1
+  _canUseFlame: 1
 --- !u!70 &1714025316
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
