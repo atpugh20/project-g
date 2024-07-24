@@ -56,10 +56,14 @@ namespace TController {
 
         private void GatherInput() {
             _frameInput = new FrameInput {
+                // Jump button
                 JumpDown = Input.GetButtonDown("Jump") || Input.GetKeyDown(KeyCode.C),
                 JumpHeld = Input.GetButton("Jump") || Input.GetKey(KeyCode.C),
+                // Fire button
                 DashDown = Input.GetButtonDown("Fire3") || Input.GetKey(KeyCode.C),
                 DashHeld = Input.GetButton("Fire3") || Input.GetKey(KeyCode.C),
+
+                // Control stick
                 Move = new Vector2(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical"))
             };
 
@@ -71,9 +75,7 @@ namespace TController {
             if (_frameInput.JumpDown) {
                 _jumpToConsume = true;
                 _timeJumpWasPressed = _time;
-            }
-            //if (_frameInput.DashDown) _canDash = true;
-            
+            }     
         }
 
         private void FixedUpdate() {
@@ -124,7 +126,6 @@ namespace TController {
 
         #endregion
 
-
         #region Jumping
 
         public bool _jumpToConsume;
@@ -165,30 +166,36 @@ namespace TController {
         private bool _isDashing = false;
         private float _dashRefreshTime = 0.5f;
         private int _timeSinceDash = 0;
+        private Vector3 _originalAngle = new(0, 0, 0);
 
         private void HandleDash() {
             _timeSinceDash++;
+
+            // Checks timing of the dash
             if (_stats.DashLength <= _timeSinceDash * Time.deltaTime) {
                 _stats.FallAcceleration = 110;
                 _isDashing = false;
                 _anim.SetBool("isFlameDashing", false);
+                _transform.eulerAngles = _originalAngle;
             }
 
+            // Checks dash conditions
             if (_grounded && !_isDashing && !_frameInput.DashHeld && _timeSinceDash * Time.deltaTime > _dashRefreshTime) _canDash = true;
             if (!_canDash || !_frameInput.DashHeld) return;
+
+            // Starts dash
+            _originalAngle = new(_transform.rotation.x, _transform.rotation.y, _transform.rotation.z);
             _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y);
             _stats.FallAcceleration = 0;
             _timeSinceDash = 0;
             _canDash = false;
             _isDashing = true;
             _endedJumpEarly = true;
-
             _anim.SetBool("isFlameDashing", true);
-
             PlayFireDashSound();
-            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);
-           // _trail.emitting = true;
-            
+            float newAngle = Mathf.Atan2(_frameInput.Move.y, _frameInput.Move.x) * Mathf.Rad2Deg;
+            _transform.eulerAngles = new Vector3(0f, _transform.rotation.y, newAngle);
+            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);   
         }
 
         #endregion
@@ -202,14 +209,16 @@ namespace TController {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
-                _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
-                if (_frameInput.Move.x > 0) {
-                    _transform.eulerAngles = new Vector3(0, 0, 0);
-                } else if (_frameInput.Move.x < 0) {
-                    _transform.eulerAngles = new Vector3(0, 180, 0);
+                if (!_isDashing) {
+                    _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
+                    if (_frameInput.Move.x > 0) {
+                        _transform.eulerAngles = new Vector3(0f, 0f, _transform.rotation.z);
+                    } else if (_frameInput.Move.x < 0) {
+                        _transform.eulerAngles = new Vector3(0f, 180f, _transform.rotation.z);
+                    }
+                    _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
+                    _anim.SetBool("isRunning", true);
                 }
-                if (!_isDashing) _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, _frameInput.Move.x * _stats.MaxSpeed, _stats.Acceleration * Time.fixedDeltaTime);
-                _anim.SetBool("isRunning", true);
             }
         }
 
@@ -233,26 +242,22 @@ namespace TController {
 
         // AUDIO
        
-
         public void PlayStepSound() => _stepSound.Play();
         public void PlayFireDashSound() => _fireDashSound.Play();
       
 
 #if UNITY_EDITOR
-        private void OnValidate()
-        {
+        private void OnValidate() {
             if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset to the Player Controller's Stats slot", this);
         }
 #endif
     
 
-    public void Die()
-        {
+    public void Die() {
             Debug.Log("Player has died!");
         }
 
-    public void Bounce(float bounceForce)
-    {
+    public void Bounce(float bounceForce){
         _frameVelocity.y = bounceForce;
         _anim.SetTrigger("takeoff");
     }
