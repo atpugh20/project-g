@@ -3,8 +3,9 @@ using UnityEngine;
 namespace TController
 {
     [CreateAssetMenu]
-    public class ScriptableStats : ScriptableObject
-    {
+    public class ScriptableStats : ScriptableObject {
+        #region Base Movement
+
         [Header("LAYERS")] [Tooltip("Set this to the layer your player is on")]
         public LayerMask PlayerLayer;
 
@@ -53,10 +54,41 @@ namespace TController
         [Tooltip("The amount of time we buffer a jump. This allows jump input before actually hitting the ground")]
         public float JumpBuffer = .2f;
 
-        [Tooltip("Base Strength of the fire dash")]
-        public float DashPower = 100;
+        #endregion
 
-        [Tooltip("Base Length of the fire dash")]
-        public float DashLength = 0.5f;
+        #region Flame
+
+        [Tooltip("Base Strength of the flame dash")]
+        public float DashPower = 75;
+
+        [Tooltip("Base time of the flame dash")]
+        public float DirectionalFlameTime = 0.1f;
+
+        [Tooltip("Base time of the Neutral flame")]
+        public float NeutralFlameTime = 1f;
+
+        #endregion
+
+        #region Earth
+
+        [Tooltip("Base time of the Directional Earth")]
+        public float DirectionalEarthTime = 0.5f;
+
+        [Tooltip("Base time of the Neutral Earth")]
+        public float NeutralEarthTime = 1f;
+
+        #endregion
+
+        #region Water
+
+        [Tooltip("Base time of the Directional Earth")]
+        public float DirectionalWaterTime = 0.5f;
+
+        [Tooltip("Base time of the Neutral Earth")]
+        public float NeutralWaterTime = 1f;
+
+        #endregion
+
+
     }
 }
