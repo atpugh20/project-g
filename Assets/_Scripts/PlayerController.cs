@@ -1,5 +1,7 @@
 using System;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace TController {
     /// <summary>
@@ -307,10 +309,11 @@ namespace TController {
 
         private float _waterRefreshTime = 1f;
         private int _timeSinceWaterUse = 0;
+        private Vector3 _originalWaterAngle = new (0, 0, 0);
         public bool CanUseWater = true;
         public bool UsingNeutralWater = false;
         public bool UsingDirectionalWater = false;
-        private Vector3 _originalWaterAngle = new(0, 0, 0);
+        public GameObject WaterBullet;
 
         private void HandleWater() {
             _timeSinceWaterUse++;
@@ -352,7 +355,7 @@ namespace TController {
             // Uses ability
             CanUseWater = false;
             _timeSinceWaterUse = 0;
-            print("DIRECTIONAL WATER");
+            Instantiate(WaterBullet, gameObject.transform.position, Quaternion.identity);
         }
 
         #endregion
