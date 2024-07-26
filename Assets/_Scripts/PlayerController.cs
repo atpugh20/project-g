@@ -34,6 +34,11 @@ namespace TController {
         public GameObject FlameDashSound;
         public GameObject LandSound;
 
+
+        public GameObject FlameDash;
+        public GameObject HidePlayerShape;
+        FlameDashActivate flameDashActivate;
+
         #region Interface
 
         public Vector2 FrameInput => _frameInput.Move;
@@ -54,11 +59,17 @@ namespace TController {
             _flameDashSound = FlameDashSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
+            flameDashActivate = FlameDash.GetComponent<FlameDashActivate>();
         }
 
         private void Update() {
             _time += Time.deltaTime;
             GatherInput();
+        }
+
+        public void ToggleShowPlayer()
+        {
+            HidePlayerShape.SetActive(true);
         }
 
         private void GatherInput() {
@@ -224,7 +235,9 @@ namespace TController {
             if (_stats.DirectionalFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
                 UsingDirectionalFlame = false;
                 UsingNeutralFlame = false;
-                _anim.SetBool("isFlameDashing", false);
+                //_anim.SetBool("isFlameDashing", false);
+                flameDashActivate.FlameDashOff();
+                //HidePlayerShape.SetActive(true);
                 _stats.FallAcceleration = 110;
                 _transform.eulerAngles = _originalAngle;
             }
@@ -237,7 +250,9 @@ namespace TController {
             UsingDirectionalFlame = true;
             UsingNeutralFlame = false;
             CanUseFlame = false;
-            _anim.SetBool("isFlameDashing", true);
+            //_anim.SetBool("isFlameDashing", true);
+            flameDashActivate.FlameDash();
+            HidePlayerShape.SetActive(false);
             _endedJumpEarly = true;
             _timeSinceFlameUse = 0;
             // dash calculation
