@@ -1887,7 +1887,6 @@ MonoBehaviour:
   hasFlame: 1
   hasWater: 1
   hasEarth: 1
-  PlayerShape: {fileID: 1724321509}
   FlameDashSound: {fileID: 750465944}
   CanUseFlame: 1
   UsingNeutralFlame: 0
@@ -1899,7 +1898,7 @@ MonoBehaviour:
   UsingNeutralWater: 0
   UsingDirectionalWater: 0
   ShootingPoint: {fileID: 1094161771}
-  WaterBullet: {fileID: 5007212144676243990, guid: 298a71552ee50c44a97782aedcb3f411, type: 3}
+  WaterBullet: {fileID: 6993092642602435026, guid: 340b93cc502d2994fa65e06fc93fc99d, type: 3}
 --- !u!1001 &611666285
 PrefabInstance:
   m_ObjectHideFlags: 0
