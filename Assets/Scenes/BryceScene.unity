@@ -1104,13 +1104,14 @@ GameObject:
   - component: {fileID: 670243694}
   - component: {fileID: 670243696}
   - component: {fileID: 670243695}
+  - component: {fileID: 670243697}
   m_Layer: 0
   m_Name: FlameDash
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &670243694
 Transform:
   m_ObjectHideFlags: 0
@@ -1199,6 +1200,18 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
+--- !u!114 &670243697
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 670243693}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 129112cfd67fe37499940325c74a5970, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &798564823
 GameObject:
   m_ObjectHideFlags: 0
@@ -1216,7 +1229,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!212 &798564824
 SpriteRenderer:
   m_ObjectHideFlags: 0
@@ -1596,11 +1609,20 @@ MonoBehaviour:
   StepSound: {fileID: 299629524}
   FlameDashSound: {fileID: 1138527166}
   LandSound: {fileID: 580417250}
+  FlameDash: {fileID: 670243693}
+  HidePlayerShape: {fileID: 1224411421}
   _grounded: 0
   _jumpToConsume: 0
-  _canUseFlame: 1
-  _canUseEarth: 1
-  _canUseWater: 1
+  CanUseFlame: 1
+  UsingNeutralFlame: 0
+  UsingDirectionalFlame: 0
+  CanUseEarth: 1
+  UsingNeutralEarth: 0
+  UsingDirectionalEarth: 0
+  CanUseWater: 1
+  UsingNeutralWater: 0
+  UsingDirectionalWater: 0
+  WaterBullet: {fileID: 0}
 --- !u!70 &876399936
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
@@ -2332,7 +2354,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &1502242259
 Transform:
   m_ObjectHideFlags: 0

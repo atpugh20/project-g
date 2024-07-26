@@ -33,6 +33,11 @@ namespace TController {
         private AudioSource _stepSound;
         private AudioSource _landSound;
 
+
+        public GameObject FlameDash;
+        public GameObject HidePlayerShape;
+        FlameDashActivate flameDashActivate;
+
         #region Interface
 
         public Vector2 FrameInput => _frameInput.Move;
@@ -52,11 +57,17 @@ namespace TController {
             _stepSound = StepSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
+            flameDashActivate = FlameDash.GetComponent<FlameDashActivate>();
         }
 
         private void Update() {
             _time += Time.deltaTime;
             GatherInput();
+        }
+
+        public void ToggleShowPlayer()
+        {
+            HidePlayerShape.SetActive(true);
         }
 
         private void GatherInput() {
@@ -168,7 +179,7 @@ namespace TController {
         }
 
         #endregion
-
+        
         #region Horizontal
 
         private void HandleDirection() {
