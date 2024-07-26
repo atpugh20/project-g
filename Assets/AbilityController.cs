@@ -22,7 +22,7 @@ public class AbilityController : MonoBehaviour {
     public bool hasEarth;
 
     // Animations
-    public GameObject PlayerShape;
+    GameObject PlayerShape;
     FlameDashActivate flameDashActivate;
 
     // Audio
@@ -40,6 +40,7 @@ public class AbilityController : MonoBehaviour {
         ShootingPoint = GameObject.Find("WaterBulletSpawner").transform;
 
         // Animations
+        PlayerShape = GameObject.Find("PlayerShape");
         flameDashActivate = GameObject.Find("FlameDash").GetComponent<FlameDashActivate>();
 
         // Audio
@@ -110,6 +111,7 @@ public class AbilityController : MonoBehaviour {
         if (UsingDirectionalFlame && _stats.DirectionalFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
             UsingDirectionalFlame = false;
             UsingNeutralFlame = false;
+            flameDashActivate.FlameDashOff();
             _anim.SetBool("isFlameDashing", false);
             PlayerShape.SetActive(true);
             _stats.FallAcceleration = 110;
@@ -245,7 +247,7 @@ public class AbilityController : MonoBehaviour {
         // Uses ability
         CanUseWater = false;
         _timeSinceWaterUse = 0;
-        Instantiate(WaterBullet, ShootingPoint.position, transform.rotation);
+        Instantiate(WaterBullet, ShootingPoint.position, Quaternion.identity);
     }
 
     #endregion

@@ -212,7 +212,9 @@ namespace TController {
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
         // AUDIO
-        public void PlayStepSound() => _stepSound.Play();
+        public void PlayStepSound() { 
+            if (_grounded) _stepSound.Play();
+        }
       
 
 #if UNITY_EDITOR
