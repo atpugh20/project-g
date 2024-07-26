@@ -59,10 +59,10 @@ namespace TController
         #region Flame
 
         [Tooltip("Base Strength of the flame dash")]
-        public float DashPower = 75;
+        public float DashPower = 70;
 
         [Tooltip("Base time of the flame dash")]
-        public float DirectionalFlameTime = 0.1f;
+        public float DirectionalFlameTime = 0.25f;
 
         [Tooltip("Base time of the Neutral flame")]
         public float NeutralFlameTime = 1f;
