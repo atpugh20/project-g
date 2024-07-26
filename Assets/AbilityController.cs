@@ -21,27 +21,40 @@ public class AbilityController : MonoBehaviour {
     public bool hasWater;
     public bool hasEarth;
 
+    // Animations
+    public GameObject PlayerShape;
+    FlameDashActivate flameDashActivate;
+
     // Audio
     public GameObject FlameDashSound;
     private AudioSource _flameDashSound;
 
     private void Awake() {
+        // Components
         _rb = GetComponent<Rigidbody2D>();
         _anim = GetComponent<Animator>();
         _transform = GetComponent<Transform>();
         _pC = GetComponent<PlayerController>();
+
+        // Abilities
         ShootingPoint = GameObject.Find("WaterBulletSpawner").transform;
+
+        // Animations
+        flameDashActivate = GameObject.Find("FlameDash").GetComponent<FlameDashActivate>();
+
+        // Audio
         _flameDashSound = FlameDashSound.GetComponent<AudioSource>();
     }
-
-
-
 
     // Update is called once per frame
     void Update() {}
 
     private void FixedUpdate() {
         HandlePowers();
+    }
+
+    public void ToggleShowPlayer() {
+        PlayerShape.SetActive(true);
     }
 
     private void HandlePowers() {
@@ -98,9 +111,9 @@ public class AbilityController : MonoBehaviour {
             UsingDirectionalFlame = false;
             UsingNeutralFlame = false;
             _anim.SetBool("isFlameDashing", false);
+            PlayerShape.SetActive(true);
             _stats.FallAcceleration = 110;
             _transform.eulerAngles = _originalAngle;
-            print("SETTING BACK");
         }
 
         // Exit Case
@@ -112,6 +125,8 @@ public class AbilityController : MonoBehaviour {
         UsingNeutralFlame = false;
         CanUseFlame = false;
         _anim.SetBool("isFlameDashing", true);
+        flameDashActivate.FlameDash();
+        PlayerShape.SetActive(false);
         _pC._endedJumpEarly = true;
         _timeSinceFlameUse = 0;
         // dash calculation

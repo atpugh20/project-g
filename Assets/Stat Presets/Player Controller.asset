@@ -30,10 +30,10 @@ MonoBehaviour:
   JumpEndEarlyGravityModifier: 3
   CoyoteTime: 0.15
   JumpBuffer: 0.2
-  DashPower: 75
-  DashTime: 0.1
-  NFlameTime: 1
-  DEarthTime: 0.5
-  NEarthTime: 1
-  DWaterTime: 0.5
-  NWaterTime: 1
+  DashPower: 71.2
+  DirectionalFlameTime: 0.25
+  NeutralFlameTime: 1
+  DirectionalEarthTime: 0.5
+  NeutralEarthTime: 1
+  DirectionalWaterTime: 0.5
+  NeutralWaterTime: 1
