@@ -23,8 +23,6 @@ public class CircleController : MonoBehaviour {
     // Update is called once per frame
     void Update() {
         FindClosestPoint();
-        
-    
     }
 
     void FindClosestPoint() {

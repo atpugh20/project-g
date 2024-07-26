@@ -14,25 +14,24 @@ namespace TController {
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerController : MonoBehaviour, IPlayerController {
         [SerializeField] private ScriptableStats _stats;
+        
+        // Components
         private Rigidbody2D _rb;
         private CapsuleCollider2D _col;
         private Animator _anim;
         private Transform _transform;
-        private TrailRenderer _trail;
-        private AudioSource _stepSound;
-        private AudioSource _flameDashSound;
-        private AudioSource _landSound;
-        private FrameInput _frameInput;
-        private Vector2 _frameVelocity;
+        private AbilityController _aC;
+
+        // Movement
+        public FrameInput _frameInput;
+        public Vector2 _frameVelocity;
         private bool _cachedQueryStartInColliders;
 
-        public bool hasStaff;
-        public bool hasFlame;
-        public bool hasWater;
-        public bool hasEarth;
+        // Audio
         public GameObject StepSound;
-        public GameObject FlameDashSound;
         public GameObject LandSound;
+        private AudioSource _stepSound;
+        private AudioSource _landSound;
 
         #region Interface
 
@@ -48,10 +47,9 @@ namespace TController {
             _rb = GetComponent<Rigidbody2D>();
             _col = GetComponent<CapsuleCollider2D>();
             _anim = GetComponent<Animator>();
+            _aC = GetComponent<AbilityController>();
             _transform = GetComponent<Transform>();
-            _trail = GetComponent<TrailRenderer>();
             _stepSound = StepSound.GetComponent<AudioSource>();
-            _flameDashSound = FlameDashSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
         }
@@ -93,16 +91,9 @@ namespace TController {
         private void FixedUpdate() {
             CheckCollisions();
             HandleJump();
-            HandlePowers();
             HandleDirection();
             HandleGravity();
             ApplyMovement();
-        }
-
-        private void HandlePowers() {
-            if (hasFlame) HandleFlame(); 
-            if (hasEarth) HandleEarth();
-            if (hasWater) HandleWater();
         }
 
         #region Collisions
@@ -148,7 +139,7 @@ namespace TController {
 
         public bool _jumpToConsume;
         private bool _bufferedJumpUsable;
-        private bool _endedJumpEarly;
+        public bool _endedJumpEarly;
         private bool _coyoteUsable;
         private float _timeJumpWasPressed;
 
@@ -178,188 +169,6 @@ namespace TController {
 
         #endregion
 
-        #region Fire
-
-        private float _flameRefreshTime = 1f;
-        private int _timeSinceFlameUse = 0;
-        public bool CanUseFlame = true;
-        public bool UsingNeutralFlame = false;
-        public bool UsingDirectionalFlame = false;
-        private Vector3 _originalAngle = new(0, 0, 0);
-
-        private void HandleFlame() {
-            _timeSinceFlameUse++;
-
-            // Checks flame conditions
-            if (_grounded && !UsingDirectionalFlame && !UsingNeutralFlame && !_frameInput.FlameHeld && _timeSinceFlameUse * Time.deltaTime > _flameRefreshTime) CanUseFlame = true;
-
-            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || UsingDirectionalFlame) {
-                HandleDirectionalFlame();
-            } else {
-                HandleNeutralFlame();
-            }
-        }
-
-        private void HandleNeutralFlame() {
-
-            // Checks timing of the ability
-            if (_stats.NeutralFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
-                UsingNeutralFlame = false;
-                UsingDirectionalFlame = false;
-            }
-
-            // Exit case
-            if (!CanUseFlame || !_frameInput.FlameHeld) return;
-
-            // Uses ability
-            UsingNeutralFlame = true;
-            UsingDirectionalFlame = false;
-            CanUseFlame = false;
-            _timeSinceFlameUse = 0;
-        }
-
-        private void HandleDirectionalFlame() {
-
-            // Checks timing of the ability
-            if (_stats.DirectionalFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
-                UsingDirectionalFlame = false;
-                UsingNeutralFlame = false;
-                _anim.SetBool("isFlameDashing", false);
-                _stats.FallAcceleration = 110;
-                _transform.eulerAngles = _originalAngle;
-            }
-            
-            // Exit Case
-            if (!CanUseFlame || !_frameInput.FlameHeld) return;
-
-            // Uses ability
-            PlayFlameDashSound();
-            UsingDirectionalFlame = true;
-            UsingNeutralFlame = false;
-            CanUseFlame = false;
-            _anim.SetBool("isFlameDashing", true);
-            _endedJumpEarly = true;
-            _timeSinceFlameUse = 0;
-            // dash calculation
-            _stats.FallAcceleration = 0;
-            _frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y); // sets velocity to 0
-            _originalAngle = new(_transform.rotation.x, _transform.rotation.y, _transform.rotation.z);
-            float newAngle = Mathf.Atan2(_frameInput.Move.y, _frameInput.Move.x) * Mathf.Rad2Deg;
-            _transform.eulerAngles = new Vector3(0f, _transform.rotation.y, newAngle);
-            _frameVelocity = new Vector2(_stats.DashPower * _frameInput.Move.x, _stats.DashPower * _frameInput.Move.y);   
-        }
-
-        #endregion
-
-        #region Earth
-
-        private float _earthRefreshTime = 1f;
-        private int _timeSinceEarthUse = 0;
-        public bool CanUseEarth = true;
-        public bool UsingNeutralEarth = false;
-        public bool UsingDirectionalEarth = false;
-        private Vector3 _originalEarthAngle = new(0, 0, 0);
-
-        private void HandleEarth() {
-            _timeSinceEarthUse++;
-
-            // Checks elemental conditions
-            if (_grounded && !UsingNeutralEarth && !UsingDirectionalEarth && !_frameInput.EarthHeld && _timeSinceEarthUse * Time.deltaTime > _earthRefreshTime) CanUseEarth = true;
-
-            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || UsingDirectionalEarth) {
-                HandleDirectionalEarth();
-            } else {
-                HandleNeutralEarth();
-            }
-        }
-        private void HandleNeutralEarth() {
-            // Checks timing of the ability
-            if (_stats.NeutralEarthTime <= _timeSinceEarthUse * Time.deltaTime) {
-                UsingNeutralEarth = false;
-            }
-
-            // Exit case
-            if (!CanUseEarth || !_frameInput.EarthHeld) return;
-
-            // Uses ability
-            CanUseEarth = false;
-            UsingNeutralEarth = true;
-            _timeSinceEarthUse = 0;
-            print("NEUTRAL EARTH");
-        }
-
-        private void HandleDirectionalEarth() {
-            // Checks timing of the ability
-            if (_stats.DirectionalEarthTime <= _timeSinceEarthUse * Time.deltaTime) {
-                UsingNeutralEarth = false;
-            }
-
-            // Exit case
-            if (!CanUseEarth || !_frameInput.EarthHeld) return;
-
-            // Uses ability
-            CanUseEarth = false;
-            _timeSinceEarthUse = 0;
-            print("SIDE EARTH");
-        }
-
-        #endregion
-
-        #region Water
-
-        private float _waterRefreshTime = 1f;
-        private int _timeSinceWaterUse = 0;
-        private Vector3 _originalWaterAngle = new (0, 0, 0);
-        public bool CanUseWater = true;
-        public bool UsingNeutralWater = false;
-        public bool UsingDirectionalWater = false;
-        public GameObject WaterBullet;
-
-        private void HandleWater() {
-            _timeSinceWaterUse++;
-
-            // Checks elemental conditions
-            if (_grounded && !UsingNeutralWater && !UsingDirectionalWater && !_frameInput.WaterHeld && _timeSinceWaterUse * Time.deltaTime > _waterRefreshTime) CanUseWater = true;
-
-            if (Mathf.Abs(_frameInput.Move.x) > 0.2 || Mathf.Abs(_frameInput.Move.y) > 0.2 || UsingDirectionalWater) {
-                HandleDirectionalWater();
-            } else {
-                HandleNeutralWater();
-            }
-        }
-        private void HandleNeutralWater() {
-            // Checks timing of the ability
-            if (_stats.NeutralWaterTime <= _timeSinceWaterUse * Time.deltaTime) {
-                UsingNeutralWater = false;
-            }
-
-            // Exit case
-            if (!CanUseWater || !_frameInput.WaterHeld) return;
-
-            // Uses ability
-            CanUseWater = false;
-            UsingNeutralWater = true;
-            _timeSinceWaterUse = 0;
-            print("NEUTRAL WATER");
-        }
-
-        private void HandleDirectionalWater() {
-            // Checks timing of the ability
-            if (_stats.DirectionalWaterTime <= _timeSinceWaterUse * Time.deltaTime) {
-                UsingNeutralWater = false;
-            }
-
-            // Exit case
-            if (!CanUseWater || !_frameInput.WaterHeld) return;
-
-            // Uses ability
-            CanUseWater = false;
-            _timeSinceWaterUse = 0;
-            Instantiate(WaterBullet, gameObject.transform.position, Quaternion.identity);
-        }
-
-        #endregion
-
         #region Horizontal
 
         private void HandleDirection() {
@@ -369,7 +178,7 @@ namespace TController {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
-                if (!UsingDirectionalFlame) {
+                if (!_aC.UsingDirectionalFlame && !_aC.UsingDirectionalWater && !_aC.UsingDirectionalEarth) {
                     _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
                     if (_frameInput.Move.x > 0) {
                         _transform.eulerAngles = new Vector3(0f, 0f, _transform.rotation.z);
@@ -401,9 +210,7 @@ namespace TController {
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
         // AUDIO
-       
         public void PlayStepSound() => _stepSound.Play();
-        public void PlayFlameDashSound() => _flameDashSound.Play();
       
 
 #if UNITY_EDITOR
