@@ -74,6 +74,9 @@ namespace TController
         [Tooltip("Base time of the Directional Earth")]
         public float DirectionalEarthTime = 0.5f;
 
+        [Tooltip("Base power of the Directional Earth")]
+        public float ThrustPower = 50;
+
         [Tooltip("Base time of the Neutral Earth")]
         public float NeutralEarthTime = 1f;
 
@@ -83,6 +86,9 @@ namespace TController
 
         [Tooltip("Base time of the Directional Earth")]
         public float DirectionalWaterTime = 0.38f;
+
+        [Tooltip("Base time of the Directional Earth")]
+        public float BlastBackPower = -50;
 
         [Tooltip("Base time of the Neutral Earth")]
         public float NeutralWaterTime = 1f;

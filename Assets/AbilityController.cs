@@ -6,9 +6,10 @@ using UnityEngine;
  
 
 public class AbilityController : MonoBehaviour {
-    [SerializeField] private ScriptableStats _stats;
-    // Game Objects
+    
+    #region INIT
 
+    [SerializeField] private ScriptableStats _stats;
 
     // Components
     private Rigidbody2D _rb;
@@ -47,16 +48,11 @@ public class AbilityController : MonoBehaviour {
         _flameDashSound = FlameDashSound.GetComponent<AudioSource>();
     }
 
-    // Update is called once per frame
-    void Update() {}
+    #endregion
 
-    private void FixedUpdate() {
-        HandlePowers();
-    }
+    private void FixedUpdate() => HandlePowers();
 
-    public void ToggleShowPlayer() {
-        PlayerShape.SetActive(true);
-    }
+    public void ToggleShowPlayer() => PlayerShape.SetActive(true);
 
     private void HandlePowers() {
         if (hasFlame) HandleFlame();
@@ -144,18 +140,21 @@ public class AbilityController : MonoBehaviour {
 
     #region Earth
 
-    private float _earthRefreshTime = 1f;
+    readonly float EarthRefreshTime = 1f;
     private int _timeSinceEarthUse = 0;
     public bool CanUseEarth = true;
     public bool UsingNeutralEarth = false;
     public bool UsingDirectionalEarth = false;
+    public float ThrustPower;
     private Vector3 _originalEarthAngle = new(0, 0, 0);
+    private Vector2 _stickDir;
+    private Vector2 _thrustDir;
 
     private void HandleEarth() {
         _timeSinceEarthUse++;
 
         // Checks elemental conditions
-        if (_pC._grounded && !UsingNeutralEarth && !UsingDirectionalEarth && !_pC._frameInput.EarthHeld && _timeSinceEarthUse * Time.deltaTime > _earthRefreshTime) CanUseEarth = true;
+        if (_pC._grounded && !UsingNeutralEarth && !UsingDirectionalEarth && !_pC._frameInput.EarthHeld && _timeSinceEarthUse * Time.deltaTime > EarthRefreshTime) CanUseEarth = true;
 
         if (Mathf.Abs(_pC._frameInput.Move.x) > 0.2 || Mathf.Abs(_pC._frameInput.Move.y) > 0.2 || UsingDirectionalEarth) {
             HandleDirectionalEarth();
@@ -182,25 +181,37 @@ public class AbilityController : MonoBehaviour {
     private void HandleDirectionalEarth() {
         // Checks timing of the ability
         if (UsingDirectionalEarth && _stats.DirectionalEarthTime <= _timeSinceEarthUse * Time.deltaTime) {
-            UsingNeutralEarth = false;
+            UsingDirectionalEarth = false;
+            _stats.FallAcceleration = 110;
         }
 
         // Exit case
         if (!CanUseEarth || !_pC._frameInput.EarthHeld) return;
 
         // Uses ability
+        _stickDir = _pC._frameInput.Move;
+        UsingDirectionalEarth = true;
         CanUseEarth = false;
         _timeSinceEarthUse = 0;
-        print("SIDE EARTH");
+        
+        //FreezeInPlace();
+        // Calculate Direction
+        if (_pC.transform.eulerAngles.y > 0) { 
+            _thrustDir = new(-_stats.ThrustPower, 10); 
+        } else {
+            _thrustDir = new(_stats.ThrustPower, 10);
+        }
+        Thrust();
     }
+
+    public void Thrust() => _pC._frameVelocity = _thrustDir;
 
     #endregion
 
     #region Water
 
-    private float _waterRefreshTime = 1f;
+    readonly float _waterRefreshTime = 1f;
     private int _timeSinceWaterUse = 0;
-    private Vector3 _originalWaterAngle = new(0, 0, 0);
     public bool CanUseWater = true;
     public bool UsingNeutralWater = false;
     public bool UsingDirectionalWater = false;
@@ -252,9 +263,7 @@ public class AbilityController : MonoBehaviour {
         
         CanUseWater = false;
         _timeSinceWaterUse = 0;
-        // blast back
-        _stats.FallAcceleration = 0;
-        _pC._frameVelocity = new Vector2(0,0); // sets velocity to 0
+        FreezeInPlace();
         
         // direction
         if (BulletDirection.y > 0.5) _anim.SetTrigger("ShootUp");
@@ -263,18 +272,34 @@ public class AbilityController : MonoBehaviour {
     }
 
     public void SpawnWaterBullet() => Instantiate(WaterBullet, ShootingPoint.position, Quaternion.identity);
-    public void BlastBack() => _pC._frameVelocity = BulletDirection * -50;
+    public void BlastBack() => _pC._frameVelocity = BulletDirection * _stats.BlastBackPower;
 
     #endregion
+
+    #region Helper Methods
+
+    private void FreezeInPlace() {
+        _stats.FallAcceleration = 0;
+        _pC._frameVelocity = Vector2.zero; // sets velocity to 0
+    }
+
+    #endregion
+
+    #region Audio
 
     // Audio Players
     public void PlayFlameDashSound() => _flameDashSound.Play();
 
+    #endregion
+
+    #region Extra
 #if UNITY_EDITOR
     private void OnValidate() {
         if (_stats == null) Debug.LogWarning("Please assign a ScriptableStats asset to the Player Controller's Stats slot", this);
     }
 #endif
+
+    #endregion
 
 }
 

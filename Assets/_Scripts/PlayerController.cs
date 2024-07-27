@@ -13,6 +13,9 @@ namespace TController {
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerController : MonoBehaviour, IPlayerController {
+
+        #region INIT
+
         [SerializeField] private ScriptableStats _stats;
         
         // Components
@@ -32,6 +35,8 @@ namespace TController {
         public GameObject LandSound;
         private AudioSource _stepSound;
         private AudioSource _landSound;
+
+        #endregion
 
         #region Interface
 
@@ -58,8 +63,6 @@ namespace TController {
             _time += Time.deltaTime;
             GatherInput();
         }
-
-
 
         private void GatherInput() {
             _frameInput = new FrameInput {
@@ -211,11 +214,14 @@ namespace TController {
 
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
-        // AUDIO
+        #region Audio
+
         public void PlayStepSound() { 
             if (_grounded) _stepSound.Play();
         }
-      
+
+        #endregion
+
 
 #if UNITY_EDITOR
         private void OnValidate() {
