@@ -65,7 +65,7 @@ namespace TController
         public float DirectionalFlameTime = 0.25f;
 
         [Tooltip("Base time of the Neutral flame")]
-        public float NeutralFlameTime = 1f;
+        public float NeutralFlameTime = 0.5f;
 
         #endregion
 
@@ -82,7 +82,7 @@ namespace TController
         #region Water
 
         [Tooltip("Base time of the Directional Earth")]
-        public float DirectionalWaterTime = 0.5f;
+        public float DirectionalWaterTime = 0.38f;
 
         [Tooltip("Base time of the Neutral Earth")]
         public float NeutralWaterTime = 1f;
