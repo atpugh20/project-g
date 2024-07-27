@@ -1465,7 +1465,8 @@ Transform:
   m_LocalPosition: {x: 1.76, y: -1.53, z: 0}
   m_LocalScale: {x: 2.1936653, y: 3.1636605, z: 2.2450984}
   m_ConstrainProportionsScale: 1
-  m_Children: []
+  m_Children:
+  - {fileID: 1094161771}
   m_Father: {fileID: 1688163493}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: -85.036}
 --- !u!212 &486869511
@@ -1867,7 +1868,6 @@ Transform:
   - {fileID: 1724321510}
   - {fileID: 282549017}
   - {fileID: 1331137593}
-  - {fileID: 1094161771}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &573835582
@@ -1899,6 +1899,7 @@ MonoBehaviour:
   UsingDirectionalWater: 0
   ShootingPoint: {fileID: 1094161771}
   WaterBullet: {fileID: 6993092642602435026, guid: 340b93cc502d2994fa65e06fc93fc99d, type: 3}
+  BulletDirection: {x: 0, y: 0}
 --- !u!1001 &611666285
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2642,12 +2643,12 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1094161770}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 2.91, y: -0.5, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: 0.67581934, w: 0.73706734}
+  m_LocalPosition: {x: 0.02, y: 0.51, z: 0.0029753814}
+  m_LocalScale: {x: 0.6038382, y: 0.9103949, z: 0.87016326}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 573835581}
+  m_Father: {fileID: 486869510}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1118687345
 GameObject:

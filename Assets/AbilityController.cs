@@ -206,6 +206,7 @@ public class AbilityController : MonoBehaviour {
     public bool UsingDirectionalWater = false;
     public Transform ShootingPoint;
     public GameObject WaterBullet;
+    public Vector2 BulletDirection;
 
     private void HandleWater() {
         _timeSinceWaterUse++;
@@ -238,17 +239,31 @@ public class AbilityController : MonoBehaviour {
     private void HandleDirectionalWater() {
         // Checks timing of the ability
         if (UsingDirectionalWater && _stats.DirectionalWaterTime <= _timeSinceWaterUse * Time.deltaTime) {
-            UsingNeutralWater = false;
+            UsingDirectionalWater = false;
+            _stats.FallAcceleration = 110;
         }
 
         // Exit case
         if (!CanUseWater || !_pC._frameInput.WaterHeld) return;
 
         // Uses ability
+        UsingDirectionalWater = true;
+        BulletDirection = _pC._frameInput.Move;
+        
         CanUseWater = false;
         _timeSinceWaterUse = 0;
-        Instantiate(WaterBullet, ShootingPoint.position, Quaternion.identity);
+        // blast back
+        _stats.FallAcceleration = 0;
+        _pC._frameVelocity = new Vector2(0,0); // sets velocity to 0
+        
+        // direction
+        if (BulletDirection.y > 0.5) _anim.SetTrigger("ShootUp");
+        if (BulletDirection.y < -0.5) _anim.SetTrigger("ShootDown");
+        if (-0.5 < BulletDirection.y && BulletDirection.y < 0.5) _anim.SetTrigger("ShootSide");
     }
+
+    public void SpawnWaterBullet() => Instantiate(WaterBullet, ShootingPoint.position, Quaternion.identity);
+    public void BlastBack() => _pC._frameVelocity = BulletDirection * -50;
 
     #endregion
 

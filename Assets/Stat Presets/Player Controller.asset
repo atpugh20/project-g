@@ -35,5 +35,5 @@ MonoBehaviour:
   NeutralFlameTime: 1
   DirectionalEarthTime: 0.5
   NeutralEarthTime: 1
-  DirectionalWaterTime: 0.5
+  DirectionalWaterTime: 0.38
   NeutralWaterTime: 1
