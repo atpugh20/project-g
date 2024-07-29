@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TController;
@@ -52,8 +53,6 @@ public class AbilityController : MonoBehaviour {
 
     private void FixedUpdate() => HandlePowers();
 
-    public void ToggleShowPlayer() => PlayerShape.SetActive(true);
-
     private void HandlePowers() {
         if (hasFlame) HandleFlame();
         if (hasEarth) HandleEarth();
@@ -62,21 +61,42 @@ public class AbilityController : MonoBehaviour {
 
     #region Flame
 
-    private float _flameRefreshTime = 0.5f;
-    private int _timeSinceFlameUse = 0;
-    public bool CanUseFlame = true;
+    private float _dFlameRefreshTime = 0.5f;
+    private float _nFlameRefreshTime = 30f;
+    private float _timeSinceDFlameUse = 0;
+    private float _timeSinceNFlameUse = 0;
+    public bool CanUseDirFlame = true;
+    public bool CanUseNeuFlame = true;
     public bool UsingNeutralFlame = false;
     public bool UsingDirectionalFlame = false;
     private Vector3 _originalAngle;
-
+    private Vector2 _flameThrustDir;
+    public Vector2 NeutralMoveDir;
+    public GameObject Fireball;
 
     private void HandleFlame() {
-        _timeSinceFlameUse++;
+        _timeSinceDFlameUse += Time.deltaTime;
+        _timeSinceNFlameUse +=Time.deltaTime;
 
-        // Checks flame conditions
-        if (_pC._grounded && !UsingDirectionalFlame && !UsingNeutralFlame && !_pC._frameInput.FlameHeld && _timeSinceFlameUse * Time.deltaTime > _flameRefreshTime) CanUseFlame = true;
+        // Checks flamedash conditions
+        if (_pC._grounded && 
+            !UsingDirectionalFlame && 
+            !UsingNeutralFlame && 
+            !_pC._frameInput.FlameHeld && 
+            _timeSinceDFlameUse > _dFlameRefreshTime) 
+            CanUseDirFlame = true;
 
-        if (Mathf.Abs(_pC._frameInput.Move.x) > 0.2 || Mathf.Abs(_pC._frameInput.Move.y) > 0.2 || UsingDirectionalFlame) {
+        // Checks neutral flame conditions
+        if (!UsingDirectionalFlame && 
+            !UsingNeutralFlame && 
+            !_pC._frameInput.FlameHeld && 
+            _timeSinceNFlameUse > _nFlameRefreshTime) 
+            CanUseNeuFlame = true;
+
+        // Decide which flame ability
+        if ((Mathf.Abs(_pC._frameInput.Move.x) > 0.2 || Mathf.Abs(_pC._frameInput.Move.y) > 0.2 || 
+            UsingDirectionalFlame) && 
+            !UsingNeutralFlame) {
             HandleDirectionalFlame();
         } else {
             HandleNeutralFlame();
@@ -86,27 +106,40 @@ public class AbilityController : MonoBehaviour {
     private void HandleNeutralFlame() {
 
         // Checks timing of the ability
-        if (_stats.NeutralFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
+        if (UsingNeutralFlame && _stats.NeutralFlameTime <= _timeSinceNFlameUse) {
+            _stats.FallAcceleration = 110;
+            if (_pC.transform.eulerAngles.y > 0) {
+                _flameThrustDir = new(_stats.NeutralFlameThrust, 50);
+                NeutralMoveDir = new(-1, 0);
+            } else {
+                _flameThrustDir = new(-_stats.NeutralFlameThrust, 50);
+                NeutralMoveDir = new(1, 0);
+            }
+            _pC._frameVelocity = _flameThrustDir;
+            _anim.SetTrigger("takeoff");
+            _anim.SetBool("isJumping", true);
             UsingNeutralFlame = false;
             UsingDirectionalFlame = false;
         }
 
         // Exit case
-        if (!CanUseFlame || !_pC._frameInput.FlameHeld) return;
+        if (!CanUseNeuFlame || !_pC._frameInput.FlameHeld) return;
 
         // Uses ability
         UsingNeutralFlame = true;
         UsingDirectionalFlame = false;
-        CanUseFlame = false;
-        _timeSinceFlameUse = 0;
+        CanUseNeuFlame = false;
+        _pC._endedJumpEarly = true;
+        _timeSinceNFlameUse = 0;
+        FreezeInPlace();
+        Instantiate(Fireball, gameObject.transform.position, Quaternion.identity);
+        NeutralMoveDir = Vector2.zero;
     }
 
     private void HandleDirectionalFlame() {
 
-        print(_pC._frameVelocity);
-
         // Checks timing of the ability
-        if (UsingDirectionalFlame && _stats.DirectionalFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
+        if (UsingDirectionalFlame && _stats.DirectionalFlameTime <= _timeSinceDFlameUse) {
             UsingDirectionalFlame = false;
             UsingNeutralFlame = false;
             flameDashActivate.FlameDashOff();
@@ -117,18 +150,18 @@ public class AbilityController : MonoBehaviour {
         }
 
         // Exit Case
-        if (!CanUseFlame || !_pC._frameInput.FlameHeld) return;
+        if (!CanUseDirFlame || !_pC._frameInput.FlameHeld) return;
 
         // Uses ability
         PlayFlameDashSound();
         UsingDirectionalFlame = true;
         UsingNeutralFlame = false;
-        CanUseFlame = false;
+        CanUseDirFlame = false;
         _anim.SetBool("isFlameDashing", true);
         flameDashActivate.FlameDash();
         PlayerShape.SetActive(false);
         _pC._endedJumpEarly = true;
-        _timeSinceFlameUse = 0;
+        _timeSinceDFlameUse = 0;
         // dash calculation
         _stats.FallAcceleration = 0;
         _pC._frameVelocity = new Vector2(-_rb.velocity.x, -_rb.velocity.y); // sets velocity to 0
@@ -143,7 +176,7 @@ public class AbilityController : MonoBehaviour {
     #region Earth
 
     readonly float EarthRefreshTime = 1f;
-    private int _timeSinceEarthUse = 0;
+    private float _timeSinceEarthUse = 0;
     public bool CanUseEarth = true;
     public bool UsingNeutralEarth = false;
     public bool UsingDirectionalEarth = false;
@@ -153,10 +186,10 @@ public class AbilityController : MonoBehaviour {
     private Vector2 _thrustDir;
 
     private void HandleEarth() {
-        _timeSinceEarthUse++;
+        _timeSinceEarthUse+=Time.deltaTime;
 
         // Checks elemental conditions
-        if (_pC._grounded && !UsingNeutralEarth && !UsingDirectionalEarth && !_pC._frameInput.EarthHeld && _timeSinceEarthUse * Time.deltaTime > EarthRefreshTime) CanUseEarth = true;
+        if (_pC._grounded && !UsingNeutralEarth && !UsingDirectionalEarth && !_pC._frameInput.EarthHeld && _timeSinceEarthUse > EarthRefreshTime) CanUseEarth = true;
 
         if (Mathf.Abs(_pC._frameInput.Move.x) > 0.2 || Mathf.Abs(_pC._frameInput.Move.y) > 0.2 || UsingDirectionalEarth) {
             HandleDirectionalEarth();
@@ -166,7 +199,7 @@ public class AbilityController : MonoBehaviour {
     }
     private void HandleNeutralEarth() {
         // Checks timing of the ability
-        if (_stats.NeutralEarthTime <= _timeSinceEarthUse * Time.deltaTime) {
+        if (_stats.NeutralEarthTime <= _timeSinceEarthUse) {
             UsingNeutralEarth = false;
         }
 
@@ -182,7 +215,7 @@ public class AbilityController : MonoBehaviour {
 
     private void HandleDirectionalEarth() {
         // Checks timing of the ability
-        if (UsingDirectionalEarth && _stats.DirectionalEarthTime <= _timeSinceEarthUse * Time.deltaTime) {
+        if (UsingDirectionalEarth && _stats.DirectionalEarthTime <= _timeSinceEarthUse) {
             UsingDirectionalEarth = false;
             _stats.FallAcceleration = 110;
         }
@@ -213,7 +246,7 @@ public class AbilityController : MonoBehaviour {
     #region Water
 
     readonly float _waterRefreshTime = 1f;
-    private int _timeSinceWaterUse = 0;
+    private float _timeSinceWaterUse = 0;
     public bool CanUseWater = true;
     public bool UsingNeutralWater = false;
     public bool UsingDirectionalWater = false;
@@ -222,10 +255,10 @@ public class AbilityController : MonoBehaviour {
     public Vector2 BulletDirection;
 
     private void HandleWater() {
-        _timeSinceWaterUse++;
+        _timeSinceWaterUse+=Time.deltaTime;
 
         // Checks elemental conditions
-        if (_pC._grounded && !UsingNeutralWater && !UsingDirectionalWater && !_pC._frameInput.WaterHeld && _timeSinceWaterUse * Time.deltaTime > _waterRefreshTime) CanUseWater = true;
+        if (_pC._grounded && !UsingNeutralWater && !UsingDirectionalWater && !_pC._frameInput.WaterHeld && _timeSinceWaterUse > _waterRefreshTime) CanUseWater = true;
 
         if (Mathf.Abs(_pC._frameInput.Move.x) > 0.2 || Mathf.Abs(_pC._frameInput.Move.y) > 0.2 || UsingDirectionalWater) {
             HandleDirectionalWater();
@@ -235,7 +268,7 @@ public class AbilityController : MonoBehaviour {
     }
     private void HandleNeutralWater() {
         // Checks timing of the ability
-        if (_stats.NeutralWaterTime <= _timeSinceWaterUse * Time.deltaTime) {
+        if (_stats.NeutralWaterTime <= _timeSinceWaterUse) {
             UsingNeutralWater = false;
         }
 
@@ -251,7 +284,7 @@ public class AbilityController : MonoBehaviour {
 
     private void HandleDirectionalWater() {
         // Checks timing of the ability
-        if (UsingDirectionalWater && _stats.DirectionalWaterTime <= _timeSinceWaterUse * Time.deltaTime) {
+        if (UsingDirectionalWater && _stats.DirectionalWaterTime <= _timeSinceWaterUse) {
             UsingDirectionalWater = false;
             _stats.FallAcceleration = 110;
         }
