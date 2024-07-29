@@ -103,6 +103,8 @@ public class AbilityController : MonoBehaviour {
 
     private void HandleDirectionalFlame() {
 
+        print(_pC._frameVelocity);
+
         // Checks timing of the ability
         if (UsingDirectionalFlame && _stats.DirectionalFlameTime <= _timeSinceFlameUse * Time.deltaTime) {
             UsingDirectionalFlame = false;
