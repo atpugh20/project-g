@@ -45,7 +45,7 @@ public class UIButtonHandle : MonoBehaviour {
         // Changes the opacity/color of the buttons when they are available
 
         // Flame Button
-        if (_aC.CanUseFlame && _aC.hasFlame) {
+        if (_aC.CanUseDirFlame && _aC.hasFlame) {
             _xButtonModifier.interactable = true;
         } else {
             _xButtonModifier.interactable = false;

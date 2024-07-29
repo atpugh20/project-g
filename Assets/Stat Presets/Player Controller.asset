@@ -32,8 +32,11 @@ MonoBehaviour:
   JumpBuffer: 0.2
   DashPower: 60
   DirectionalFlameTime: 0.27
-  NeutralFlameTime: 1
+  NeutralFlameTime: 0.5
+  NeutralFlameThrust: 50
   DirectionalEarthTime: 0.5
+  ThrustPower: 50
   NeutralEarthTime: 1
   DirectionalWaterTime: 0.38
+  BlastBackPower: -50
   NeutralWaterTime: 1

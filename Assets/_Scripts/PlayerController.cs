@@ -13,6 +13,9 @@ namespace TController {
     /// </summary>
     [RequireComponent(typeof(Rigidbody2D), typeof(Collider2D))]
     public class PlayerController : MonoBehaviour, IPlayerController {
+
+        #region INIT
+
         [SerializeField] private ScriptableStats _stats;
         
         // Components
@@ -32,6 +35,8 @@ namespace TController {
         public GameObject LandSound;
         private AudioSource _stepSound;
         private AudioSource _landSound;
+
+        #endregion
 
         #region Interface
 
@@ -58,8 +63,6 @@ namespace TController {
             _time += Time.deltaTime;
             GatherInput();
         }
-
-
 
         private void GatherInput() {
             _frameInput = new FrameInput {
@@ -116,6 +119,7 @@ namespace TController {
             // Landed on the Ground
             if (!_grounded && groundHit) {
                 _landSound.Play();
+                _anim.SetBool("isFalling", false);
                 _anim.SetBool("isJumping", false);
                 _grounded = true;
                 _coyoteUsable = true;
@@ -126,7 +130,7 @@ namespace TController {
             }
             // Left the Ground
             else if (_grounded && !groundHit) {
-                _anim.SetBool("isJumping", true);
+                if (!_anim.GetBool("isJumping")) _anim.SetBool("isFalling", true);
                 _grounded = false;
                 _frameLeftGrounded = _time;
                 GroundedChanged?.Invoke(false, 0);
@@ -151,8 +155,8 @@ namespace TController {
 
         private void HandleJump() {
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
-
             if (!_jumpToConsume && !HasBufferedJump) return;
+            if (_aC.UsingNeutralFlame) return;
             if (_grounded || CanUseCoyote) ExecuteJump(); 
            
             _jumpToConsume = false;
@@ -165,7 +169,7 @@ namespace TController {
             _coyoteUsable = false;
             _frameVelocity.y = _stats.JumpPower;
             _anim.SetTrigger("takeoff");
-
+            _anim.SetBool("isJumping", true);
             Jumped?.Invoke();
         }
 
@@ -180,7 +184,10 @@ namespace TController {
                 var deceleration = _grounded ? _stats.GroundDeceleration : _stats.AirDeceleration;
                 _frameVelocity.x = Mathf.MoveTowards(_frameVelocity.x, 0, deceleration * Time.fixedDeltaTime);
             } else {
-                if (!_aC.UsingDirectionalFlame && !_aC.UsingDirectionalWater && !_aC.UsingDirectionalEarth) {
+                if (!_aC.UsingDirectionalFlame && 
+                    !_aC.UsingNeutralFlame && 
+                    !_aC.UsingDirectionalWater && 
+                    !_aC.UsingDirectionalEarth) {
                     _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
                     if (_frameInput.Move.x > 0) {
                         _transform.eulerAngles = new Vector3(0f, 0f, _transform.rotation.z);
@@ -211,11 +218,14 @@ namespace TController {
 
         private void ApplyMovement() => _rb.velocity = _frameVelocity;
 
-        // AUDIO
+        #region Audio
+
         public void PlayStepSound() { 
-            if (_grounded) _stepSound.Play();
+            if (_grounded && !_aC.UsingDirectionalFlame) _stepSound.Play();
         }
-      
+
+        #endregion
+
 
 #if UNITY_EDITOR
         private void OnValidate() {
@@ -231,9 +241,10 @@ namespace TController {
     public void Bounce(float bounceForce){
         _frameVelocity.y = bounceForce;
         _anim.SetTrigger("takeoff");
+        _anim.SetBool("isJumping", true);
     }
 
-   }
+}
 
     public struct FrameInput {
         public bool JumpDown;

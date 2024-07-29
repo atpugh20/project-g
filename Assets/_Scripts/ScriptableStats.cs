@@ -40,7 +40,7 @@ namespace TController
         public float JumpPower = 36;
 
         [Tooltip("The maximum vertical movement speed")]
-        public float MaxFallSpeed = 40;
+        public float MaxFallSpeed = 120;
 
         [Tooltip("The player's capacity to gain fall speed. a.k.a. In Air Gravity")]
         public float FallAcceleration = 110;
@@ -59,13 +59,16 @@ namespace TController
         #region Flame
 
         [Tooltip("Base Strength of the flame dash")]
-        public float DashPower = 70;
+        public float DashPower = 60;
 
         [Tooltip("Base time of the flame dash")]
-        public float DirectionalFlameTime = 0.25f;
+        public float DirectionalFlameTime = 0.27f;
 
         [Tooltip("Base time of the Neutral flame")]
         public float NeutralFlameTime = 0.5f;
+
+        [Tooltip("Velocity for the player shooting out of the side of the Big Fireball")]
+        public float NeutralFlameThrust = 50;
 
         #endregion
 
@@ -73,6 +76,9 @@ namespace TController
 
         [Tooltip("Base time of the Directional Earth")]
         public float DirectionalEarthTime = 0.5f;
+
+        [Tooltip("Base power of the Directional Earth")]
+        public float ThrustPower = 50;
 
         [Tooltip("Base time of the Neutral Earth")]
         public float NeutralEarthTime = 1f;
@@ -83,6 +89,9 @@ namespace TController
 
         [Tooltip("Base time of the Directional Earth")]
         public float DirectionalWaterTime = 0.38f;
+
+        [Tooltip("Base time of the Directional Earth")]
+        public float BlastBackPower = -50;
 
         [Tooltip("Base time of the Neutral Earth")]
         public float NeutralWaterTime = 1f;

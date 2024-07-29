@@ -40,8 +40,5 @@ public class WaterBulletController : MonoBehaviour {
         StartKill();
     }
 
-
     public void StartKill() => _anim.SetBool("isMoving", false);
-             
-    
 }
