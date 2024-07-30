@@ -1,0 +1,167 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1 &119341958620185676
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7796234744238839668}
+  m_Layer: 0
+  m_Name: SpikesRotatable
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7796234744238839668
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 119341958620185676}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 754.35254, y: -524.3081, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 709051331040796538}
+  - {fileID: 6336882795386882191}
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1001 &1628167255238726817
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7796234744238839668}
+    m_Modifications:
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -10.952515
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 27.408112
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3652042
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 0.92387956
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.38268343
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 45
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750702234754169568, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_Name
+      value: 90SpikesStandingPlatform
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+--- !u!4 &709051331040796538 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+  m_PrefabInstance: {fileID: 1628167255238726817}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1001 &5241704290468807508
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 7796234744238839668}
+    m_Modifications:
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.7159001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1.7159001
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -16.452515
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 32.508118
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0.3652042
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: -0.38268325
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0.9238796
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 225
+      objectReference: {fileID: 0}
+    - target: {fileID: 8750702234754169568, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+      propertyPath: m_Name
+      value: 90SpikesStandingPlatform (1)
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+--- !u!4 &6336882795386882191 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 2256135273016003547, guid: 0b1d6fe3533cd5544b11e1626431035c, type: 3}
+  m_PrefabInstance: {fileID: 5241704290468807508}
+  m_PrefabAsset: {fileID: 0}
