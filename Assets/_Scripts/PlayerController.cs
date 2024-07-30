@@ -1,7 +1,9 @@
 using System;
+using System.Collections;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.UIElements;
+using UnityEngine.SceneManagement;
 
 namespace TController {
     /// <summary>
@@ -24,6 +26,13 @@ namespace TController {
         private Animator _anim;
         private Transform _transform;
         private AbilityController _aC;
+
+        //Respawn
+        //private Vector3 respawnPoint;
+        public GameObject fallDetector;
+        public Vector3 Checkpoint;
+        [SerializeField]
+        GameObject Hero;
 
         // Movement
         public FrameInput _frameInput;
@@ -57,11 +66,15 @@ namespace TController {
             _stepSound = StepSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
+            //respawnPoint = transform.position;
+            Checkpoint = _rb.position;
         }
 
         private void Update() {
             _time += Time.deltaTime;
             GatherInput();
+            print(Checkpoint);
+            print(_rb.position);
         }
 
         private void GatherInput() {
@@ -236,6 +249,16 @@ namespace TController {
 
     public void Die() {
             Debug.Log("Player has died!");
+            StartCoroutine(Respawn());
+        }
+
+    IEnumerator Respawn()
+        {
+            Destroy(gameObject, 1f);
+            //_anim.SetTrigger("Death");
+            yield return new WaitForSeconds(.9f);
+            //Instantiate(Hero, Checkpoint, Quaternion.identity);
+            SceneManager.LoadScene(2);
         }
 
     public void Bounce(float bounceForce){
@@ -244,7 +267,15 @@ namespace TController {
         _anim.SetBool("isJumping", true);
     }
 
-}
+       private void OnTriggerEnter2D(Collider2D collision)
+        {
+            if (collision.tag == "FallDetector")
+            {
+                Die();
+            }
+        }
+
+    }
 
     public struct FrameInput {
         public bool JumpDown;
