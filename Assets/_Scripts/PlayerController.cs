@@ -73,8 +73,8 @@ namespace TController {
         private void Update() {
             _time += Time.deltaTime;
             GatherInput();
-            print(Checkpoint);
-            print(_rb.position);
+            //print(Checkpoint);
+            //print(_rb.position);
         }
 
         private void GatherInput() {
@@ -107,6 +107,12 @@ namespace TController {
         }
 
         private void FixedUpdate() {
+
+            if (DialogueManager.GetInstance().dialogueisPlaying)
+            {
+                return;
+            }
+
             CheckCollisions();
             HandleJump();
             HandleDirection();
