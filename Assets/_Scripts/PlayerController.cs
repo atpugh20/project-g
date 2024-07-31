@@ -108,10 +108,10 @@ namespace TController {
 
         private void FixedUpdate() {
 
-            if (DialogueManager.GetInstance().dialogueisPlaying)
+           /* if (DialogueManager.GetInstance().dialogueisPlaying)
             {
                 return;
-            }
+            }*/
 
             CheckCollisions();
             HandleJump();
@@ -257,6 +257,7 @@ namespace TController {
             Debug.Log("Player has died!");
             StartCoroutine(Respawn());
         }
+
 
     IEnumerator Respawn()
         {
