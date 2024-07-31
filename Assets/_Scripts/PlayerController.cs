@@ -33,6 +33,7 @@ namespace TController {
         public Vector3 Checkpoint;
         [SerializeField]
         GameObject Hero;
+        public bool isDying = false;
 
         // Movement
         public FrameInput _frameInput;
@@ -107,12 +108,7 @@ namespace TController {
         }
 
         private void FixedUpdate() {
-
-           /* if (DialogueManager.GetInstance().dialogueisPlaying)
-            {
-                return;
-            }*/
-
+            if (isDying) return;
             CheckCollisions();
             HandleJump();
             HandleDirection();
@@ -254,18 +250,16 @@ namespace TController {
     
 
     public void Die() {
+            isDying = true;
             Debug.Log("Player has died!");
             StartCoroutine(Respawn());
         }
 
 
-    IEnumerator Respawn()
-        {
-            Destroy(gameObject, 1f);
-            //_anim.SetTrigger("Death");
-            yield return new WaitForSeconds(.9f);
-            //Instantiate(Hero, Checkpoint, Quaternion.identity);
-            SceneManager.LoadScene(2);
+    IEnumerator Respawn() {
+            _anim.SetTrigger("Death");
+            yield return new WaitForSeconds(2.9f);
+            SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
 
     public void Bounce(float bounceForce){
@@ -274,10 +268,8 @@ namespace TController {
         _anim.SetBool("isJumping", true);
     }
 
-       private void OnTriggerEnter2D(Collider2D collision)
-        {
-            if (collision.tag == "FallDetector")
-            {
+       private void OnTriggerEnter2D(Collider2D collision) {
+            if (collision.tag == "FallDetector") {
                 Die();
             }
         }
