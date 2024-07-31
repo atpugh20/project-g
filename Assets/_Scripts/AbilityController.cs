@@ -53,6 +53,16 @@ public class AbilityController : MonoBehaviour {
 
     private void FixedUpdate() => HandlePowers();
 
+    public void Grab()
+    {
+        hasStaff = true;
+        GameObject staffhand = GameObject.Find("staff2");
+        print(staffhand);
+        staffhand.GetComponent<SpriteRenderer>().enabled = true;
+        GameObject staffped = GameObject.Find("staffinstone");
+        staffped.SetActive(false);
+    }
+
     private void HandlePowers() {
         if (hasFlame) HandleFlame();
         if (hasEarth) HandleEarth();
@@ -170,6 +180,7 @@ public class AbilityController : MonoBehaviour {
         _transform.eulerAngles = new Vector3(0f, _transform.rotation.y, newAngle);
         _pC._frameVelocity = new Vector2(_stats.DashPower * _pC._frameInput.Move.x, _stats.DashPower * _pC._frameInput.Move.y);
     }
+
 
     #endregion
 
