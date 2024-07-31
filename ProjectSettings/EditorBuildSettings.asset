@@ -14,4 +14,16 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Fire.unity
     guid: d2b5ec53b71262a4581fe12e41be251a
+  - enabled: 1
+    path: Assets/Scenes/SigilRooms/FireSigilRoom.unity
+    guid: 3a99e9f9baadf5441804a434ceeac92d
+  - enabled: 1
+    path: Assets/Scenes/FireLevel1.unity
+    guid: 40e62bc1cf198b94695503ccb419d775
+  - enabled: 1
+    path: Assets/Scenes/FireLevel2.unity
+    guid: e35b4bc1121be7d43b78b7e921ef96f5
+  - enabled: 1
+    path: Assets/Scenes/SigilRooms/WaterSigilRoom.unity
+    guid: d59a6dce8900e6d40bb5e4bd863352c4
   m_configObjects: {}

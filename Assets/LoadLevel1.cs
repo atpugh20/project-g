@@ -4,7 +4,5 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class LoadLevel1 : MonoBehaviour {
-    private void OnCollisionEnter2D(Collision2D collision) {
-        // Go to level 1;
-    }
+    private void OnCollisionEnter2D(Collision2D collision) => SceneManager.LoadScene(4);
 }
