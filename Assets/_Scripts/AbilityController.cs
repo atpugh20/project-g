@@ -57,13 +57,13 @@ public class AbilityController : MonoBehaviour {
     {
         hasStaff = true;
         GameObject staffhand = GameObject.Find("staff2");
-        print(staffhand);
         staffhand.GetComponent<SpriteRenderer>().enabled = true;
         GameObject staffped = GameObject.Find("staffinstone");
         staffped.SetActive(false);
     }
 
     private void HandlePowers() {
+        if (_pC.isDying) return;
         if (hasFlame) HandleFlame();
         if (hasEarth) HandleEarth();
         if (hasWater) HandleWater();
@@ -324,7 +324,7 @@ public class AbilityController : MonoBehaviour {
 
     #region Helper Methods
 
-    private void FreezeInPlace() {
+    public void FreezeInPlace() {
         _stats.FallAcceleration = 0;
         _pC._frameVelocity = Vector2.zero; // sets velocity to 0
     }

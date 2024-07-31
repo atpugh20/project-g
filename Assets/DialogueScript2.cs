@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TController;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -18,19 +19,23 @@ public class DialogueScript2 : MonoBehaviour
     public GameObject text;
     public GameObject image1;
 
+    private PlayerController _pC;
+
     private bool playfirsttext = true;
 
     // Start is called before the first frame update
     void Start()
     {
+        _pC = GameObject.Find("Player").GetComponent<PlayerController>();
         textComponent.text = string.Empty;
+        _pC.inDialogue = true;
         StartDialogue();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump"))
         {
             if (textComponent.text == lines[index])
             {
@@ -70,16 +75,18 @@ public class DialogueScript2 : MonoBehaviour
         }
         else
         {
-                text.SetActive(false);
-                image1.SetActive(false);
-                this.GetComponent<Image>().enabled = false;
+            text.SetActive(false);
+            image1.SetActive(false);
+            this.GetComponent<Image>().enabled = false;
             if (playfirsttext) { 
                 StartCoroutine(yoink());
+            } else {
+                _pC.inDialogue = false;
             }
-                
-                //gameObject.SetActive(false);
 
-            
+            //gameObject.SetActive(false);
+
+
         }
     }
 

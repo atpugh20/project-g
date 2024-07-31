@@ -34,6 +34,7 @@ namespace TController {
         [SerializeField]
         GameObject Hero;
         public bool isDying = false;
+        public bool inDialogue;
 
         // Movement
         public FrameInput _frameInput;
@@ -43,8 +44,10 @@ namespace TController {
         // Audio
         public GameObject StepSound;
         public GameObject LandSound;
+        public GameObject DeathSound;
         private AudioSource _stepSound;
         private AudioSource _landSound;
+        private AudioSource _deathSound;
 
         #endregion
 
@@ -66,9 +69,11 @@ namespace TController {
             _transform = GetComponent<Transform>();
             _stepSound = StepSound.GetComponent<AudioSource>();
             _landSound = LandSound.GetComponent<AudioSource>();
+            _deathSound = DeathSound.GetComponent<AudioSource>();
             _cachedQueryStartInColliders = Physics2D.queriesStartInColliders;
             //respawnPoint = transform.position;
             Checkpoint = _rb.position;
+            _stats.FallAcceleration = 110;
         }
 
         private void Update() {
@@ -108,7 +113,6 @@ namespace TController {
         }
 
         private void FixedUpdate() {
-            if (isDying) return;
             CheckCollisions();
             HandleJump();
             HandleDirection();
@@ -145,7 +149,6 @@ namespace TController {
             }
             // Left the Ground
             else if (_grounded && !groundHit) {
-                if (!_anim.GetBool("isJumping")) _anim.SetBool("isFalling", true);
                 _grounded = false;
                 _frameLeftGrounded = _time;
                 GroundedChanged?.Invoke(false, 0);
@@ -158,7 +161,7 @@ namespace TController {
 
         #region Jumping
 
-        public bool _jumpToConsume;
+        public bool _jumpToConsume = false;
         private bool _bufferedJumpUsable;
         public bool _endedJumpEarly;
         private bool _coyoteUsable;
@@ -172,6 +175,8 @@ namespace TController {
             if (!_endedJumpEarly && !_grounded && !_frameInput.JumpHeld && _rb.velocity.y > 0) _endedJumpEarly = true;
             if (!_jumpToConsume && !HasBufferedJump) return;
             if (_aC.UsingNeutralFlame) return;
+            if (isDying) return;
+            if (inDialogue) return;
             if (_grounded || CanUseCoyote) ExecuteJump(); 
            
             _jumpToConsume = false;
@@ -202,7 +207,9 @@ namespace TController {
                 if (!_aC.UsingDirectionalFlame && 
                     !_aC.UsingNeutralFlame && 
                     !_aC.UsingDirectionalWater && 
-                    !_aC.UsingDirectionalEarth) {
+                    !_aC.UsingDirectionalEarth &&
+                    !isDying &&
+                    !inDialogue) {
                     _anim.SetFloat("runSpeedMultiplier", Mathf.Abs(_rb.velocity.x / 20));
                     if (_frameInput.Move.x > 0) {
                         _transform.eulerAngles = new Vector3(0f, 0f, _transform.rotation.z);
@@ -250,8 +257,12 @@ namespace TController {
     
 
     public void Die() {
+            _deathSound.Play();
+            _anim.SetTrigger("Death");
             isDying = true;
-            Debug.Log("Player has died!");
+            _frameVelocity = Vector2.zero;
+            _stats.FallAcceleration = 110;
+            _anim.SetTrigger("Death");
             StartCoroutine(Respawn());
         }
 
