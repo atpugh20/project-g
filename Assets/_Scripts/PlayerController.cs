@@ -235,7 +235,7 @@ namespace TController {
 
         #endregion
 
-        private void ApplyMovement() => _rb.velocity = _frameVelocity;
+        public void ApplyMovement() => _rb.velocity = _frameVelocity;
 
         #region Audio
 

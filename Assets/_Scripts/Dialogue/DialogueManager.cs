@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using Ink.Runtime;
+using UnityEngine.EventSystems;
+using TController;
 
 public class DialogueManager : MonoBehaviour
 {
@@ -21,6 +23,10 @@ public class DialogueManager : MonoBehaviour
 
     public bool dialogueisPlaying { get; private set; }
 
+    public GameObject player;
+    private PlayerController playerController;
+    private Animator animator;
+
     private void Awake()
     {
         if (instance != null)
@@ -37,6 +43,9 @@ public class DialogueManager : MonoBehaviour
 
     private void Start()
     {
+        playerController = player.GetComponent<PlayerController>();
+        animator = player.GetComponent<Animator>();
+
         dialogueisPlaying = false;
         dialoguePanel.SetActive(false);
 
@@ -59,7 +68,7 @@ public class DialogueManager : MonoBehaviour
             return;
         }
 
-        if (Input.GetKeyUp(KeyCode.I))
+        if (InputManager.GetInstance().GetSubmitPressed())
         {
             ContinueStory();
         }
@@ -68,6 +77,11 @@ public class DialogueManager : MonoBehaviour
 
     public void EnterDialogueMode(TextAsset inkJSON)
     {
+
+        playerController._frameVelocity = Vector2.zero;
+        playerController.ApplyMovement();
+        animator.SetBool("isRunning", false);
+        playerController.enabled = false;
         currentStory = new Story(inkJSON.text);
         dialogueisPlaying = true;
         dialoguePanel.SetActive(true);
@@ -78,9 +92,12 @@ public class DialogueManager : MonoBehaviour
 
     private IEnumerator ExitDialogueMode()
     {
-        yield return new WaitForSeconds(.1f);
+        yield return new WaitForSeconds(1f);
 
+        playerController.enabled = true;
         dialogueisPlaying = false;
+
+        
         dialoguePanel.SetActive(false);
         dialogueText.text = "";
     }
@@ -120,8 +137,21 @@ public class DialogueManager : MonoBehaviour
             {
                 choices[i].gameObject.SetActive(false);
             }
+            SelectFirstChoice();
 
         }
     }
+
+    private void SelectFirstChoice()
+    {
+        EventSystem.current.SetSelectedGameObject(choices[0].gameObject);
+    }
+
+    public void MakeChoice(int choiceIndex)
+    {
+        print(choiceIndex);
+        currentStory.ChooseChoiceIndex(choiceIndex);
+    }
+
 
 }
