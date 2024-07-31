@@ -9,11 +9,8 @@ EditorBuildSettings:
     path: Assets/Scenes/Main Menu.unity
     guid: d6d6a4e8685f5134ab5f8c28f7b17669
   - enabled: 1
-    path: Assets/Scenes/SampleScene.unity
-    guid: 2cda990e2423bbf4892e6590ba056729
-  - enabled: 1
-    path: Assets/Scenes/Fire.unity
-    guid: d2b5ec53b71262a4581fe12e41be251a
+    path: Assets/Scenes/Temple.unity
+    guid: 1d181b9a3f5aafe4abf6a43fbd467fea
   - enabled: 1
     path: Assets/Scenes/SigilRooms/FireSigilRoom.unity
     guid: 3a99e9f9baadf5441804a434ceeac92d
@@ -28,4 +25,3 @@ EditorBuildSettings:
     guid: d59a6dce8900e6d40bb5e4bd863352c4
   m_configObjects:
     com.unity.input.settings: {fileID: 11400000, guid: f8e11ee12dcbcb8449ce57c235d43dcf, type: 2}
-

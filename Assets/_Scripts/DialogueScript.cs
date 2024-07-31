@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using TController;
 
 public class DialogueScript : MonoBehaviour
 {
@@ -11,18 +12,21 @@ public class DialogueScript : MonoBehaviour
     public float textSpeed;
 
     private int index;
+    private PlayerController _pC;
 
     // Start is called before the first frame update
     void Start()
     {
+        _pC = GameObject.Find("Player").GetComponent<PlayerController>();
         textComponent.text = string.Empty;
+        _pC.inDialogue = true;
         StartDialogue();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButtonDown(0) || Input.GetButtonDown("Jump"))
         {
             if (textComponent.text == lines[index])
             {
@@ -63,6 +67,7 @@ public class DialogueScript : MonoBehaviour
         else
         {
             gameObject.SetActive(false);
+            _pC.inDialogue = false;
             print("is this working?");
         }
     }
