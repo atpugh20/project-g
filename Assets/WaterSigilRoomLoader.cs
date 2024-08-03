@@ -4,5 +4,6 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class WaterSigilRoomLoader : MonoBehaviour {
-    private void OnCollisionEnter2D(Collision2D collision) => SceneManager.LoadScene(6);
+    public int NextScene = 5;
+    private void OnCollisionEnter2D(Collision2D collision) => SceneManager.LoadScene(NextScene);
 }
